@@ -1,0 +1,62 @@
+Media Downloader
+================
+
+A private, local media downloader. Nothing is uploaded, no account is required,
+and every setting stays on this machine.
+
+
+What gets installed
+-------------------
+
+  * Media Downloader        the application and its interface
+  * mediadl-engine.exe      the bundled download engine, used automatically
+
+Settings, logs and download history are written to:
+
+  %APPDATA%\MediaDownloader
+
+They are kept when you uninstall, so reinstalling restores your setup. Delete
+that folder by hand if you want a clean slate.
+
+
+What it needs
+-------------
+
+  * ffmpeg, to merge video with audio and to convert audio formats. If it is
+    not on your PATH, set its location in Settings. Without it, downloads that
+    need merging will fail.
+
+  * Google Chrome or Microsoft Edge, only if you intend to use HDRezka. That
+    part needs the companion browser extension, which is documented in the
+    manual.
+
+Nothing else is required. Python does not need to be installed; the engine is
+bundled.
+
+
+Third-party components
+----------------------
+
+This application is built on open-source software, used under their respective
+licences:
+
+  yt-dlp        Unlicense       extraction and downloading
+  ffmpeg        LGPL / GPL      muxing and conversion
+  mutagen       GPL-2.0         audio metadata tagging
+  HdRezkaApi    MIT             HDRezka page parsing
+  Electron      MIT             application shell
+  Inter         SIL OFL 1.1     interface typeface
+  Comfortaa     SIL OFL 1.1     logo typeface
+
+The browser extension included with this project is an original implementation.
+
+
+Terms
+-----
+
+This software is provided as is, without warranty of any kind. It is a tool for
+retrieving media you are entitled to retrieve. You are responsible for how you
+use it and for respecting the terms of the sites you download from and the
+rights of copyright holders.
+
+Download only what you have the right to download.

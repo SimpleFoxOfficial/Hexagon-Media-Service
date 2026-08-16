@@ -1,0 +1,45 @@
+# ---------------------------------------------------------------- Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+*.spec.bak
+
+# ------------------------------------------------------------------ Node
+node_modules/
+desktop/node_modules/
+npm-debug.log*
+
+# --------------------------------------------------- build output (all of it)
+# PyInstaller
+build/
+dist/
+build-engine/
+dist-engine/
+# electron-builder (output dir has moved a few times chasing an AV lock)
+build-output/
+dist-desktop/
+dist-release/
+release/
+*.asar
+
+# Staged binaries pulled in at build time, not source. ffmpeg is ~160 MB and
+# re-stageable with tools/stage_ffmpeg.py, so it stays out of git.
+vendor/
+
+# The Comfortaa logo font (OFL, redistribution permitted) IS committed, so a
+# fresh clone builds with the right logo. It is intentionally not ignored.
+
+# ------------------------------------------------------------- local artefacts
+*.log
+*.part
+*.ytdl
+downloads/
+
+# --------------------------------------------------------------------- editors
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

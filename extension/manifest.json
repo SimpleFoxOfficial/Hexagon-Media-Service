@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Media Downloader Bridge",
+  "version": "1.0.0",
+  "description": "Sends the video stream a HDRezka page has already resolved to the local Media Downloader app.",
+  "permissions": ["storage", "activeTab", "scripting", "downloads", "tabs", "alarms"],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*.js"],
+      "matches": ["https://*.rezka.ag/*", "https://*.hdrezka.ag/*", "https://*.hdrezka.me/*", "https://*.rezka.co/*"]
+    }
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://*.rezka.ag/*",
+    "https://rezka.ag/*",
+    "https://*.hdrezka.ag/*",
+    "https://hdrezka.ag/*",
+    "https://*.hdrezka.me/*",
+    "https://*.rezka.co/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Send to Media Downloader", "default_popup": "popup.html" },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.rezka.ag/*",
+        "https://rezka.ag/*",
+        "https://*.hdrezka.ag/*",
+        "https://hdrezka.ag/*",
+        "https://*.hdrezka.me/*",
+        "https://*.rezka.co/*"
+      ],
+      "js": ["lib/hdrezka.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

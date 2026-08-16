@@ -1,0 +1,147 @@
+/*
+ * Design tokens following Modrinth's system (modrinth/code,
+ * packages/assets/styles/variables.scss): layered numbered surfaces, semantic
+ * colour ramps with matching 10% background and 25% highlight variants, and a
+ * small radius scale. Green is the brand accent.
+ */
+
+:root {
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-max: 9999px;
+
+  --font-sans: Inter, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-logo: Comfortaa, Inter, "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, "SF Mono", monospace;
+
+  --gap-xs: 0.25rem;
+  --gap-sm: 0.5rem;
+  --gap-md: 0.75rem;
+  --gap-lg: 1rem;
+  --gap-xl: 1.5rem;
+
+  --transition: 120ms ease;
+}
+
+/* --------------------------------------------------------------- dark */
+
+:root,
+:root[data-theme="dark"] {
+  --surface-1: #16181c;
+  --surface-1-5: #1a1c20;
+  --surface-2: #1d1f23;
+  --surface-2-5: #222429;
+  --surface-3: #27292e;
+  --surface-4: #34363c;
+  --surface-5: #42444a;
+
+  --color-red: #ed4661;
+  --color-orange: #e7a038;
+  --color-green: #09de78;
+  --color-blue: #5196df;
+  --color-purple: #ba7eff;
+  --color-gray: #83868d;
+
+  --color-red-bg: rgba(237, 70, 97, 0.1);
+  --color-orange-bg: rgba(231, 160, 56, 0.1);
+  --color-green-bg: rgba(9, 222, 120, 0.1);
+  --color-blue-bg: rgba(81, 150, 223, 0.1);
+  --color-purple-bg: rgba(186, 126, 255, 0.1);
+  --color-gray-bg: rgba(131, 134, 141, 0.1);
+
+  --color-red-highlight: rgba(237, 70, 97, 0.25);
+  --color-green-highlight: rgba(9, 222, 120, 0.25);
+  --color-blue-highlight: rgba(81, 150, 223, 0.25);
+
+  --color-text-primary: #ffffff;
+  --color-text-default: #c8cbd2;
+  --color-text-tertiary: #96a0b0;
+
+  --color-bg: var(--surface-1);
+  --color-raised-bg: var(--surface-3);
+  --color-super-raised-bg: var(--surface-4);
+  --color-button-bg: var(--surface-4);
+  --color-button-bg-hover: var(--surface-5);
+  --color-divider: var(--surface-5);
+  --color-scrollbar: #4a4d55;
+
+  --color-base: var(--color-text-default);
+  --color-secondary: var(--color-text-tertiary);
+  --color-contrast: var(--color-text-primary);
+  --color-accent-contrast: #06100b;
+
+  --color-brand: var(--color-green);
+  --color-brand-bg: var(--color-green-bg);
+  --color-brand-highlight: var(--color-green-highlight);
+  /* Dark wash behind an active pill; the label sits on it in bright green. */
+  --color-brand-pill: rgba(9, 222, 120, 0.16);
+
+  --shadow-card: rgba(0, 0, 0, 0.25) 0 2px 4px 0;
+  --shadow-raised: 0 2px 6px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+/* -------------------------------------------------------------- light */
+
+:root[data-theme="light"] {
+  --surface-1: #ebebeb;
+  --surface-1-5: #ededed;
+  --surface-2: #f5f5f5;
+  --surface-2-5: #eef1f5;
+  --surface-3: #f8f8f8;
+  --surface-4: #ffffff;
+  --surface-5: #dddddd;
+
+  --color-red: #cb2245;
+  --color-orange: #c66019;
+  --color-green: #00af5c;
+  --color-blue: #1f68c0;
+  --color-purple: #8e32f3;
+  --color-gray: #595b61;
+
+  --color-red-bg: rgba(203, 34, 69, 0.1);
+  --color-orange-bg: rgba(224, 131, 37, 0.1);
+  --color-green-bg: rgba(0, 175, 92, 0.1);
+  --color-blue-bg: rgba(31, 104, 192, 0.1);
+  --color-purple-bg: rgba(142, 50, 243, 0.1);
+  --color-gray-bg: rgba(89, 91, 97, 0.1);
+
+  --color-red-highlight: rgba(203, 34, 69, 0.25);
+  --color-green-highlight: rgba(0, 175, 92, 0.25);
+  --color-blue-highlight: rgba(31, 104, 192, 0.25);
+
+  --color-text-primary: #1a202c;
+  --color-text-default: #2c2e31;
+  --color-text-tertiary: #484d54;
+
+  --color-bg: var(--surface-1);
+  --color-raised-bg: var(--surface-3);
+  --color-super-raised-bg: var(--surface-4);
+  --color-button-bg: var(--surface-4);
+  --color-button-bg-hover: var(--surface-2-5);
+  --color-divider: var(--surface-5);
+  --color-scrollbar: #96a2b0;
+
+  --color-base: var(--color-text-default);
+  --color-secondary: var(--color-text-tertiary);
+  --color-contrast: var(--color-text-primary);
+  --color-accent-contrast: #ffffff;
+
+  --color-brand: var(--color-green);
+  --color-brand-bg: var(--color-green-bg);
+  --color-brand-highlight: var(--color-green-highlight);
+  --color-brand-pill: rgba(0, 175, 92, 0.14);
+
+  --shadow-card: rgba(50, 50, 100, 0.1) 0 2px 4px 0;
+  --shadow-raised: 0 2px 6px rgba(0, 0, 0, 0.12);
+  color-scheme: light;
+}
+
+/* Accent overrides: the brand colour is swappable without touching anything else. */
+:root[data-accent="blue"] { --color-brand: var(--color-blue); --color-brand-bg: var(--color-blue-bg); --color-brand-highlight: var(--color-blue-highlight); --color-brand-pill: rgba(81, 150, 223, 0.18); --color-accent-contrast: #ffffff; }
+:root[data-accent="purple"] { --color-brand: var(--color-purple); --color-brand-bg: var(--color-purple-bg); --color-brand-pill: rgba(186, 126, 255, 0.18); --color-accent-contrast: #ffffff; }
+:root[data-accent="orange"] { --color-brand: var(--color-orange); --color-brand-bg: var(--color-orange-bg); --color-brand-pill: rgba(231, 160, 56, 0.18); --color-accent-contrast: #ffffff; }
+:root[data-accent="red"] { --color-brand: var(--color-red); --color-brand-bg: var(--color-red-bg); --color-brand-pill: rgba(237, 70, 97, 0.18); --color-accent-contrast: #ffffff; }

@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --bg: #16181c; --raised: #27292e; --line: #42444a;
+        --text: #c8cbd2; --dim: #96a0b0; --brand: #09de78; --red: #ed4661;
+      }
+      body {
+        width: 380px; max-height: 560px; margin: 0; padding: 14px;
+        font: 13px/1.5 "Segoe UI", system-ui, sans-serif;
+        background: var(--bg); color: var(--text);
+      }
+      h1 { font-size: 14px; font-weight: 500; margin: 0 0 2px; color: #fff; }
+      .sub { font-size: 12px; color: var(--dim); margin-bottom: 10px; }
+      label { display: block; font-size: 11px; color: var(--dim); margin: 8px 0 3px; }
+      select, input {
+        width: 100%; padding: 7px 9px; border-radius: 8px;
+        border: 1px solid var(--line); background: #1a1c20; color: #fff; font: inherit;
+      }
+      button {
+        padding: 8px 12px; border: none; border-radius: 8px; cursor: pointer;
+        font: inherit; font-weight: 500; background: var(--raised); color: #fff;
+      }
+      button.brand { background: var(--brand); color: #06100b; width: 100%; margin-top: 10px; }
+      button:disabled { opacity: .45; cursor: default; }
+      .row { display: flex; gap: 6px; align-items: center; }
+      .row > * { flex: 1; }
+      .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+      .chip {
+        padding: 3px 8px; border-radius: 6px; background: var(--raised);
+        color: var(--dim); font-size: 11px; cursor: pointer; user-select: none;
+        border: 1px solid transparent;
+      }
+      .chip.on { background: rgba(9,222,120,.14); color: var(--brand); border-color: rgba(9,222,120,.35); }
+      .eps { max-height: 168px; overflow-y: auto; margin-top: 6px; }
+      #status { margin-top: 10px; font-size: 12px; color: var(--dim); word-break: break-word; }
+      #status.err { color: var(--red); }
+      #status.ok { color: var(--brand); }
+      .link { color: var(--brand); font-size: 11px; cursor: pointer; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <h1 id="title">Media Downloader</h1>
+    <div class="sub" id="sub">Reading the page...</div>
+
+    <div id="panel" class="hidden">
+      <label for="translator">Translation / dub</label>
+      <select id="translator"></select>
+
+      <div class="row">
+        <div>
+          <label for="quality">Quality</label>
+          <select id="quality">
+            <option value="best">Best available</option>
+            <option value="2160">2160p</option>
+            <option value="1080">1080p</option>
+            <option value="720">720p</option>
+            <option value="480">480p</option>
+            <option value="360">360p</option>
+            <option value="worst">Smallest</option>
+          </select>
+        </div>
+        <div id="season-wrap">
+          <label for="season">Season</label>
+          <select id="season"></select>
+        </div>
+      </div>
+
+      <div id="episode-wrap">
+        <label>Episodes <span class="link" id="all">all</span> / <span class="link" id="none">none</span></label>
+        <input id="range" type="text" placeholder="1-10 or 3,5,7 then Enter" />
+        <div class="eps"><div class="chips" id="episodes"></div></div>
+      </div>
+
+      <button class="brand" id="go">Download</button>
+    </div>
+
+    <div id="status"></div>
+    <div style="margin-top:8px"><span class="link" id="options">Options</span></div>
+    <script src="popup.js"></script>
+  </body>
+</html>

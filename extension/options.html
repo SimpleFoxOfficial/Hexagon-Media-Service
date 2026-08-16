@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        max-width: 520px; margin: 40px auto; padding: 0 20px;
+        font: 14px/1.6 "Segoe UI", system-ui, sans-serif;
+        background: #16181c; color: #c8cbd2;
+      }
+      h1 { font-size: 18px; color: #fff; }
+      label { display: block; margin: 16px 0 6px; font-size: 13px; color: #96a0b0; }
+      input {
+        width: 100%; padding: 9px 11px; border-radius: 8px;
+        border: 1px solid #42444a; background: #1a1c20; color: #fff; font: inherit;
+      }
+      button {
+        margin-top: 16px; padding: 9px 16px; border: none; border-radius: 8px;
+        background: #09de78; color: #06100b; font: inherit; font-weight: 600; cursor: pointer;
+      }
+      #msg { margin-top: 12px; font-size: 13px; }
+      .ok { color: #09de78; }
+      .err { color: #ed4661; }
+      p { color: #96a0b0; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <h1>Media Downloader Bridge</h1>
+    <p>
+      Open Media Downloader, go to <b>Download &rarr; HDRezka</b>, and copy the pairing
+      token shown there. The extension only ever talks to this address on your own
+      machine.
+    </p>
+    <label for="base">App address</label>
+    <input id="base" type="text" placeholder="http://127.0.0.1:47615" />
+    <label for="token">Pairing token</label>
+    <input id="token" type="text" placeholder="paste the token from the app" />
+    <button id="save">Save and test</button>
+    <div id="msg"></div>
+    <script src="options.js"></script>
+  </body>
+</html>

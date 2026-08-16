@@ -1,0 +1,73 @@
+{
+  "name": "media-downloader-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Electron shell for Media Downloader. The interface is web; the engine is Python.",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.simplefox.mediadownloader",
+    "productName": "Media Downloader",
+    "directories": {
+      "output": "../build-output"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist-engine",
+        "to": "engine"
+      },
+      {
+        "from": "../docs/Media-Downloader-Manual.pdf",
+        "to": "Media-Downloader-Manual.pdf"
+      },
+      {
+        "from": "../vendor/ffmpeg",
+        "to": "ffmpeg"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "../mediadl/resources/app.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Media Downloader",
+      "menuCategory": false,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "../mediadl/resources/app.ico",
+      "uninstallerIcon": "../mediadl/resources/app.ico",
+      "installerHeaderIcon": "../mediadl/resources/app.ico",
+      "license": "installer/LICENSE.txt",
+      "include": "installer/installer.nsh",
+      "artifactName": "Media Downloader ${version} Setup.${ext}",
+      "uninstallDisplayName": "Media Downloader ${version}"
+    },
+    "extraMetadata": {
+      "description": "Private downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites"
+    }
+  },
+  "allowScripts": {
+    "electron@33.4.11": true
+  }
+}
