@@ -1,0 +1,284 @@
+/*
+ * Hexagon Media Service - project page.
+ *
+ * One committed dark look, because every screenshot on the page is dark and a
+ * light variant would fight them. Colours are the app's own: the same green
+ * brand and the same numbered surfaces, so the page and the product read as one
+ * thing. Layout is deliberately airy - one screenshot does most of the work.
+ */
+
+:root {
+  --surface-1: #0f1113;
+  --surface-2: #16181c;
+  --surface-3: #1d1f23;
+  --surface-4: #27292e;
+  --surface-5: #34363c;
+
+  --brand: #09de78;
+  --brand-dim: rgba(9, 222, 120, 0.12);
+
+  --text: #c8cbd2;
+  --text-bright: #ffffff;
+  --text-dim: #8b93a1;
+
+  --radius: 1rem;
+  --radius-sm: 0.6rem;
+  --max: 1120px;
+
+  --font: Inter, "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Cascadia Mono", ui-monospace, Consolas, "SF Mono", monospace;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--surface-1);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  /*
+   * Relative, so the glow below is positioned and clipped by this element.
+   * Left static it resolves against the initial containing block instead,
+   * escapes overflow-x and gives the whole page a horizontal scrollbar.
+   */
+  position: relative;
+  overflow-x: hidden;
+}
+
+/*
+ * A wide, soft green wash behind the fold. It sits under everything and is
+ * pinned to the top, so the page darkens as it scrolls without a second image.
+ */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 820px;
+  /*
+   * The ellipse is sized inside the gradient rather than by an oversized box.
+   * A 1400px-wide box centred with a transform hangs past a narrower viewport,
+   * and body's overflow-x cannot clip it: with overflow visible on html, the
+   * body's overflow propagates to the viewport and body stops clipping at all.
+   */
+  background: radial-gradient(ellipse 1400px 820px at 50% -80px, rgba(9, 222, 120, 0.17), transparent 62%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+main, .top, .foot { position: relative; z-index: 1; }
+
+h1, h2, h3 { color: var(--text-bright); letter-spacing: -0.03em; margin: 0; font-weight: 600; }
+p { margin: 0; }
+code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+  background: var(--surface-4);
+  font-family: var(--mono);
+  font-size: 0.86em;
+  color: var(--text-bright);
+}
+
+/* ------------------------------------------------------------------ header */
+
+.top {
+  display: flex; align-items: center; gap: 2rem;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 0;
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  color: var(--text-bright); text-decoration: none;
+  font-family: Comfortaa, var(--font);
+  font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.top-nav { display: flex; gap: 1.6rem; margin-left: auto; font-size: 0.9rem; }
+.top-nav a { color: var(--text-dim); text-decoration: none; transition: color 140ms ease; }
+.top-nav a:hover { color: var(--text-bright); }
+
+/* -------------------------------------------------------------------- hero */
+
+.hero {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 6rem 1.5rem 0;
+  text-align: center;
+}
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--brand-dim);
+  color: var(--brand);
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.01em;
+}
+.hero h1 {
+  font-size: clamp(2.75rem, 7.5vw, 5.25rem);
+  line-height: 1.02;
+  margin-bottom: 1.5rem;
+}
+.lede {
+  max-width: 46rem;
+  margin: 0 auto;
+  color: var(--text-dim);
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+}
+
+.cta { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 2.25rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 9999px;
+  font-size: 0.95rem; font-weight: 500;
+  text-decoration: none;
+  transition: transform 140ms ease, filter 140ms ease, background 140ms ease;
+}
+.btn.primary { background: var(--brand); color: #06100b; }
+.btn.primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn.ghost { background: var(--surface-4); color: var(--text-bright); }
+.btn.ghost:hover { background: var(--surface-5); transform: translateY(-1px); }
+
+.meta { margin-top: 1rem; color: var(--text-dim); font-size: 0.85rem; }
+
+/*
+ * The hero shot leans back and straightens as it scrolls into place. The
+ * transform is driven from JS on a custom property, and the whole effect is
+ * skipped for anyone who asked for reduced motion.
+ */
+.hero-shot {
+  --lean: 1;
+  margin: 4.5rem auto 0;
+  max-width: 1180px;
+  perspective: 1800px;
+}
+.hero-shot img {
+  display: block;
+  width: 100%; height: auto;
+  border: 1px solid var(--surface-5);
+  border-radius: var(--radius);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 90px -40px rgba(9, 222, 120, 0.5);
+  transform: rotateX(calc(9deg * var(--lean))) scale(calc(1 - 0.04 * var(--lean)));
+  transform-origin: 50% 0%;
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------------- strip */
+
+.strip {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 3.5rem;
+  max-width: var(--max);
+  margin: 5rem auto 0;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--surface-4);
+  border-bottom: 1px solid var(--surface-4);
+}
+.strip-item { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+.strip-item b { color: var(--brand); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
+.strip-item span { color: var(--text-dim); font-size: 0.85rem; }
+
+/* ---------------------------------------------------------------- features */
+
+.section-title {
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.features { max-width: var(--max); margin: 0 auto; padding: 7rem 1.5rem 0; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.card {
+  padding: 1.75rem;
+  border: 1px solid var(--surface-4);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+.card:hover { border-color: var(--surface-5); transform: translateY(-2px); }
+.card h3 { font-size: 1.05rem; margin-bottom: 0.6rem; }
+.card p { color: var(--text-dim); font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------ splits */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: 4rem;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 7rem 1.5rem 0;
+}
+/*
+ * Reversing the order alone would hand the screenshot the narrow column and
+ * shrink it against the sections either side, so the track widths swap too.
+ */
+.split.reverse { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.split.reverse .split-copy { order: 2; }
+.split-copy { display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; }
+.split-copy h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); line-height: 1.15; }
+.split-copy p { color: var(--text-dim); }
+.split-shot img {
+  display: block;
+  width: 100%; height: auto;
+  border: 1px solid var(--surface-4);
+  border-radius: var(--radius);
+  box-shadow: 0 30px 70px -35px rgba(0, 0, 0, 0.9);
+}
+
+/* ------------------------------------------------------------------ closer */
+
+.closer {
+  max-width: var(--max);
+  margin: 7rem auto 0;
+  padding: 5rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid var(--surface-4);
+}
+.closer h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
+
+/* ------------------------------------------------------------------ footer */
+
+.foot {
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  border-top: 1px solid var(--surface-4);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.foot nav { display: flex; gap: 1.5rem; margin-left: auto; flex-wrap: wrap; }
+.foot a { color: var(--text-dim); text-decoration: none; }
+.foot a:hover { color: var(--text-bright); }
+
+/* ----------------------------------------------------------------- narrow */
+
+@media (max-width: 860px) {
+  .split, .split.reverse { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+  .split.reverse .split-copy { order: 0; }
+  .top-nav { display: none; }
+  .hero { padding-top: 4rem; }
+  .strip { gap: 2rem 2.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-shot img { transform: none; }
+  .btn:hover, .card:hover { transform: none; }
+}

@@ -446,6 +446,98 @@ select { cursor: pointer; }
 .banner.error { background: var(--color-red-bg); color: var(--color-red); }
 .banner.ok { background: var(--color-brand-bg); color: var(--color-brand); }
 
+/* ------------------------------------------------------------ updates */
+
+/*
+ * The navbar only carries an update pill when there is one to carry: an empty
+ * slot collapses, so the strip is unchanged the rest of the time.
+ */
+.update-slot { display: flex; align-items: center; }
+.nav-update {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-max);
+  border: none; background: var(--color-brand-bg); color: var(--color-brand);
+  font: inherit; font-size: 0.75rem; font-weight: 500;
+  cursor: pointer; white-space: nowrap;
+  transition: filter var(--transition);
+}
+.nav-update:hover { filter: brightness(1.15); }
+
+.update-line { font-size: 0.875rem; color: var(--color-secondary); }
+.update-line.good { color: var(--color-brand); font-weight: 500; }
+
+/* -------------------------------------------------------------- dialog */
+
+.backdrop {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  padding: var(--gap-xl);
+  background: rgba(0, 0, 0, 0.55);
+  animation: fade 140ms ease;
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  width: min(640px, 100%); max-height: 82vh;
+  display: flex; flex-direction: column;
+  background: var(--color-raised-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised);
+  overflow: hidden;
+  animation: rise 160ms ease;
+}
+.modal-head {
+  display: flex; align-items: center; gap: var(--gap-sm);
+  padding: var(--gap-lg); border-bottom: 1px solid var(--color-divider);
+}
+.modal-body {
+  display: flex; flex-direction: column; gap: var(--gap-md);
+  padding: var(--gap-lg); overflow-y: auto;
+}
+.modal-foot {
+  display: flex; align-items: center; gap: var(--gap-sm); flex-wrap: wrap;
+  padding: var(--gap-md) var(--gap-lg); border-top: 1px solid var(--color-divider);
+  background: var(--surface-2);
+}
+
+/* --------------------------------------------------------- release notes */
+
+/*
+ * The notes are parsed into elements, never injected, so this styles real tags
+ * rather than a blob of remote HTML.
+ */
+.notes { user-select: text; font-size: 0.8125rem; line-height: 1.65; color: var(--color-base); }
+.notes > *:first-child { margin-top: 0; }
+.notes > *:last-child { margin-bottom: 0; }
+.notes h4, .notes h5 { margin: 1.1rem 0 0.4rem; color: var(--color-contrast); }
+.notes h4 { font-size: 0.9375rem; }
+.notes h5 { font-size: 0.8125rem; }
+.notes p { margin: 0.6rem 0; }
+.notes ul, .notes ol { margin: 0.4rem 0 0.8rem; padding-left: 1.4rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.notes blockquote {
+  margin: 0.75rem 0; padding-left: 0.85rem;
+  border-left: 3px solid var(--color-divider); color: var(--color-secondary);
+}
+.notes pre {
+  margin: 0.75rem 0; padding: var(--gap-md);
+  border-radius: var(--radius-md); background: var(--surface-1-5);
+  font-family: var(--font-mono); font-size: 0.75rem;
+  white-space: pre-wrap; word-break: break-word; overflow-x: auto;
+}
+.notes code {
+  padding: 0.1rem 0.3rem; border-radius: var(--radius-xs);
+  background: var(--surface-4); font-family: var(--font-mono); font-size: 0.9em;
+}
+.notes hr { margin: 1rem 0; border: none; border-top: 1px solid var(--color-divider); }
+.notes .link {
+  background: none; border: none; padding: 0;
+  color: var(--color-brand); font: inherit; cursor: pointer;
+}
+.notes .link:hover { text-decoration: underline; }
+.notes .link:disabled { cursor: default; opacity: 1; }
+
 @media (max-width: 1080px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
   .rail { position: static; }

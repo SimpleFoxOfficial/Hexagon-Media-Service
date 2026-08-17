@@ -4,22 +4,8 @@
  * download does not re-render every tick.
  */
 
-const ICONS = {
-  download: 'M12 3v11M7.5 10.5 12 15l4.5-4.5M4 20h16',
-  queue: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
-  settings: 'M3.5 7.5h4M12.5 7.5h8M3.5 16.5h8.5M17.5 16.5h3M10 5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M15 14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5',
-  logs: 'M13 4.5H7a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5zM13 4.5v5h5',
-  play: 'M9 6.2 18 12l-9 5.8z',
-  pause: 'M9.5 6v12M14.5 6v12',
-  close: 'M7 7l10 10M17 7 7 17',
-  retry: 'M20 12a8 8 0 1 1-2.4-5.7M20.5 3.5v4h-4',
-  folder: 'M4 7.5A1.5 1.5 0 0 1 5.5 6h3.6l2 2h7.4A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z',
-  trash: 'M5 7h14M10 7V5h4v2M7.5 7l.9 12h7.2l.9-12',
-  video: 'M3.5 7.5a1 1 0 0 1 1-1H15a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4.5a1 1 0 0 1-1-1zM16 10.5 20.5 7.5v9L16 13.5z',
-  browser: 'M3.5 6.5a1 1 0 0 1 1-1h15a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1zM3.5 9.5h17M6 7.5h.01M8.5 7.5h.01',
-  link: 'M10.6 13.4a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 1 0-5.7-5.7l-1 1M13.4 10.6a4 4 0 0 0-5.7 0l-2.8 2.8a4 4 0 1 0 5.7 5.7l1-1',
-  check: 'M5 12.5 9.5 17 19 7.5'
-}
+import { el, icon, toast, humanSize } from './dom.js'
+import { startUpdates, updatesCard, paintUpdateSlot } from './updates.js'
 
 /** The app mark: film strip with a download arrow, tilted two degrees. */
 function brandMark(size = 26) {
@@ -42,31 +28,6 @@ function brandMark(size = 26) {
   </svg>`
 }
 
-function icon(name, size = 18) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"
-    ><path d="${ICONS[name] || ICONS.video}"/></svg>`
-}
-
-const el = (html) => {
-  const t = document.createElement('template')
-  t.innerHTML = html.trim()
-  return t.content.firstElementChild
-}
-
-function humanSize(bytes) {
-  const n = Number(bytes) || 0
-  if (!n) return ''
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let value = n
-  let i = 0
-  while (value >= 1024 && i < units.length - 1) {
-    value /= 1024
-    i++
-  }
-  return `${i === 0 ? Math.round(value) : value.toFixed(1)} ${units[i]}`
-}
-
 const state = {
   page: 'download',
   jobs: new Map(),
@@ -80,16 +41,6 @@ const state = {
   engineReady: false,
   logLines: [],
   service: 'auto'
-}
-
-// ------------------------------------------------------------------ toasts
-
-function toast(message, kind = 'info', ms = 3600) {
-  const host = document.getElementById('toasts')
-  const node = el(`<div class="toast ${kind}"></div>`)
-  node.textContent = message
-  host.appendChild(node)
-  setTimeout(() => node.remove(), ms)
 }
 
 // -------------------------------------------------------------- engine api
@@ -118,6 +69,7 @@ function renderShell() {
         </div>
         <nav class="nav-links" id="nav"></nav>
         <div class="grow drag-region"></div>
+        <div class="update-slot" id="update-slot"></div>
         <div class="engine-state"><span class="dot" id="engine-dot"></span><span id="engine-text">starting engine</span></div>
         <div class="window-controls">
           <button class="win-btn" id="win-min" title="Minimise" aria-label="Minimise">
@@ -194,6 +146,10 @@ function renderShell() {
     item.addEventListener('click', () => navigate(key))
     nav.appendChild(item)
   }
+
+  // The strip is rebuilt from scratch here, so whatever the update check has
+  // already found has to be put back into it.
+  paintUpdateSlot()
 }
 
 function navigate(page) {
@@ -893,6 +849,8 @@ function renderSettings(page) {
     patch({ cookies_from_browser: e.target.value })
   )
 
+  inner.appendChild(updatesCard())
+
   const about = el(`
     <div class="card">
       <div class="card-head"><h2>About</h2></div>
@@ -1462,6 +1420,10 @@ document.documentElement.dataset.accent = localStorage.getItem('accent') || 'gre
 renderShell()
 navigate('download')
 setEngineState(false, 'starting engine')
+// The releases check is independent of the engine: it runs in the main process
+// and has nothing to wait for. It is also entirely optional, so a failure here
+// is logged and dropped rather than allowed to take the interface down with it.
+startUpdates().catch((err) => console.error('update check failed', err))
 setInterval(() => {
   if (state.page === 'logs') refreshLogs()
 }, 2000)

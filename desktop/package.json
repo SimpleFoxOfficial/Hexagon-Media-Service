@@ -1,6 +1,6 @@
 {
   "name": "hexagon-media-service",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Electron shell for Hexagon Media Service. The interface is web; the engine is Python.",
   "main": "src/main/main.js",
@@ -19,6 +19,13 @@
     "directories": {
       "output": "../build-output"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "SimpleFoxOfficial",
+        "repo": "Hexagon-Media-Service"
+      }
+    ],
     "files": [
       "src/**/*",
       "package.json"
@@ -64,8 +71,11 @@
       "installerHeaderIcon": "../mediadl/resources/app.ico",
       "license": "installer/LICENSE.txt",
       "include": "installer/installer.nsh",
-      "artifactName": "Hexagon Media Service ${version} Setup.${ext}",
+      "artifactName": "Hexagon-Media-Service-${version}-Setup.${ext}",
       "uninstallDisplayName": "Hexagon Media Service ${version}"
+    },
+    "portable": {
+      "artifactName": "Hexagon-Media-Service-${version}-Portable.${ext}"
     },
     "extraMetadata": {
       "description": "Hexagon Media Service - private downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites"

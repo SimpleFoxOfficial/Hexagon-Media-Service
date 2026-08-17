@@ -30,6 +30,11 @@ Built because online converter sites are slow, ad-ridden and untrustworthy.
   configurable yt-dlp filename template.
 - **A real queue.** Concurrent downloads with pause, resume, retry, per-item
   logs, speed and ETA.
+- **Updates itself.** The app checks GitHub for a new release, shows the notes,
+  and installs it on request: the download is verified against the checksum
+  published beside it, and the app reopens on the new version. It also shows
+  what changed the first time a new version starts. The check is one request on
+  launch and can be turned off in Settings; nothing is downloaded until asked.
 
 ## Look and feel
 

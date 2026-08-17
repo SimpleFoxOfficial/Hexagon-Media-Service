@@ -3,6 +3,7 @@
 const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron')
 const path = require('path')
 const { EngineBridge } = require('./bridge')
+const updater = require('./updater')
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..')
 const isDev = process.argv.includes('--dev')
@@ -167,3 +168,27 @@ ipcMain.handle('dialog:pickFolder', async (_event, current) => {
   })
   return result.canceled ? null : result.filePaths[0]
 })
+
+// ------------------------------------------------------------- updates
+
+ipcMain.handle('app:version', () => app.getVersion())
+
+ipcMain.handle('update:status', (_event, force) =>
+  force === true ? updater.checkForUpdate() : updater.lastStatus()
+)
+
+ipcMain.handle('update:install', () =>
+  updater.downloadAndInstall((progress) => send('update:progress', progress))
+)
+
+// No version means "the notes for the version now running, if they have not
+// been shown yet"; a version means "that release, whatever it is".
+ipcMain.handle('update:changelog', (_event, version) =>
+  typeof version === 'string' && version.length > 0
+    ? updater.changelogFor(version)
+    : updater.pendingChangelog()
+)
+
+ipcMain.handle('update:acknowledge', (_event, version) => updater.acknowledgeChangelog(version))
+
+ipcMain.handle('update:autoCheck', (_event, value) => updater.setCheckOnStart(value === true))

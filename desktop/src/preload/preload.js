@@ -82,3 +82,33 @@ contextBridge.exposeInMainWorld('host', {
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
   pickFolder: (current) => ipcRenderer.invoke('dialog:pickFolder', current)
 })
+
+const updateListeners = new Set()
+ipcRenderer.on('update:progress', (_e, progress) => {
+  for (const fn of updateListeners) {
+    try {
+      fn(progress)
+    } catch {
+      /* ignore */
+    }
+  }
+})
+
+/**
+ * The releases API is reached from the main process only; this surface hands
+ * back what it found. The renderer never opens a connection of its own.
+ */
+contextBridge.exposeInMainWorld('updates', {
+  version: () => ipcRenderer.invoke('app:version'),
+  /** force: ask GitHub. Otherwise report whatever the last check found. */
+  status: (force) => ipcRenderer.invoke('update:status', force === true),
+  install: () => ipcRenderer.invoke('update:install'),
+  /** null asks for the notes of the running version, if they are still unseen. */
+  changelog: (version) => ipcRenderer.invoke('update:changelog', version || null),
+  acknowledge: (version) => ipcRenderer.invoke('update:acknowledge', version),
+  setAutoCheck: (value) => ipcRenderer.invoke('update:autoCheck', value === true),
+  onProgress(fn) {
+    updateListeners.add(fn)
+    return () => updateListeners.delete(fn)
+  }
+})

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hexagon Media Service</title>
+    <meta
+      name="description"
+      content="A private desktop downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites. Everything runs locally: no account, no telemetry, nothing uploaded."
+    />
+
+    <meta property="og:title" content="Hexagon Media Service" />
+    <meta
+      property="og:description"
+      content="A private desktop downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites. Nothing is uploaded."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="shots/download-dark.png" />
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="top">
+      <a class="wordmark" href="#top">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="26" height="26">
+          <g transform="rotate(2 12 12)">
+            <rect x="3" y="4.6" width="18" height="14.8" rx="1.9" fill="#c8cbd2" />
+            <rect x="4.6" y="8.1" width="14.8" height="7.8" rx="1.1" fill="#09de78" />
+            <g stroke="#0b0c0e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M12 9.2v4.2M9.9 11.5 12 13.7l2.1-2.2M9.4 14.9h5.2" />
+            </g>
+          </g>
+        </svg>
+        <span>Hexagon Media Service</span>
+      </a>
+
+      <nav class="top-nav">
+        <a href="#features">Features</a>
+        <a href="#hdrezka">HDRezka</a>
+        <a href="#private">Private</a>
+        <a href="Hexagon-Media-Service-Manual.pdf">Manual</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">Windows desktop app</p>
+        <h1>Download anything.<br />Keep everything.</h1>
+        <p class="lede">
+          YouTube, HDRezka, Reddit, Twitter and about 1800 other sites, filed and tagged the way you
+          want them. Everything runs on your machine: no account, no telemetry, nothing uploaded.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" id="download" href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v11M7.5 10.5 12 15l4.5-4.5M4 20h16" />
+            </svg>
+            <span id="download-label">Download for Windows</span>
+          </a>
+          <a class="btn ghost" id="portable" href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases/latest">
+            Portable build
+          </a>
+        </div>
+
+        <p class="meta" id="release-meta">Windows 10 and 11, 64-bit. Installer and portable.</p>
+
+        <figure class="hero-shot" id="hero-shot">
+          <img
+            src="shots/download-dark.png"
+            alt="The Download page: service tabs, a link box, format and destination cards"
+            width="1240"
+            height="860"
+          />
+        </figure>
+      </section>
+
+      <section class="strip">
+        <div class="strip-item"><b>~1800</b><span>supported sites</span></div>
+        <div class="strip-item"><b>0</b><span>accounts required</span></div>
+        <div class="strip-item"><b>4K</b><span>and everything below it</span></div>
+        <div class="strip-item"><b>Local</b><span>nothing leaves the machine</span></div>
+      </section>
+
+      <section class="features" id="features">
+        <h2 class="section-title">What it does</h2>
+
+        <div class="grid">
+          <article class="card">
+            <h3>Many sources</h3>
+            <p>
+              Anything yt-dlp supports, plus a dedicated HDRezka resolver. Paste a link into Auto and
+              the right handler picks it up by itself.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Many ways</h3>
+            <p>
+              Video with audio, audio only or video only. 360p to 4K. MP4, MKV or WEBM; MP3, M4A,
+              Opus, FLAC, WAV or Vorbis at a chosen bitrate.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>A real queue</h3>
+            <p>
+              Concurrent downloads with pause, resume and retry, live speed and ETA, and a per-item
+              error that says what actually went wrong.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Bulk by design</h3>
+            <p>
+              Paste many links at once, or drop in a playlist or channel and have every entry expand
+              into its own queue item.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Tagged properly</h3>
+            <p>
+              Title, artist, album, date, chapters, subtitles and cover art are embedded into the
+              finished file, with the source URL written on top.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Filed properly</h3>
+            <p>
+              A season lands as <code>Show / Season 06 / Show - S06E20.mp4</code>, and the exact path
+              is shown before anything is queued.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="split" id="hdrezka">
+        <div class="split-copy">
+          <p class="eyebrow">HDRezka</p>
+          <h2>A whole season, chosen in one place</h2>
+          <p>
+            Load a title, then pick the translation, the quality and any mix of seasons and episodes:
+            select all, a single season, or a range like <code>1-10</code> or <code>3,5,7</code>.
+          </p>
+          <p>
+            HDRezka refuses direct requests with a bot check, so the page is read inside your own
+            browser through a small extension. Everything after that is decided in the app, and the
+            queue narrates every stage: downloading, waiting for the file, moving, tagging.
+          </p>
+        </div>
+        <figure class="split-shot">
+          <img
+            src="shots/hdrezka-dark.png"
+            alt="The HDRezka panel: destination, the read-the-open-tab button, and the extension notice"
+            width="1240"
+            height="642"
+          />
+        </figure>
+      </section>
+
+      <section class="split reverse">
+        <div class="split-copy">
+          <p class="eyebrow">Queue</p>
+          <h2>Everything in flight, in one list</h2>
+          <p>
+            Engine downloads and browser transfers appear side by side, each row patched in place so
+            a running download never redraws the page.
+          </p>
+          <p>
+            Files are moved with the same Win32 call Explorer uses, one at a time, and a transfer is
+            only filed once its size has settled and the byte count matches. A truncated file is
+            refused rather than saved.
+          </p>
+        </div>
+        <figure class="split-shot">
+          <img
+            src="shots/queue-dark.png"
+            alt="The Queue page with jobs in several states"
+            width="1240"
+            height="860"
+          />
+        </figure>
+      </section>
+
+      <section class="split" id="private">
+        <div class="split-copy">
+          <p class="eyebrow">Private by construction</p>
+          <h2>Nothing is uploaded, ever</h2>
+          <p>
+            There is no server side and no account. The only outbound requests are the ones you ask
+            for: the sites you download from, and one check against the GitHub releases API when the
+            app starts, which you can switch off.
+          </p>
+          <p>
+            Updates are downloaded on request and verified against the checksum published beside the
+            installer. Settings, history and logs stay in
+            <code>%APPDATA%\HexagonMediaService</code>.
+          </p>
+        </div>
+        <figure class="split-shot">
+          <img
+            src="shots/settings-dark.png"
+            alt="The Settings page showing the Updates card"
+            width="1240"
+            height="860"
+          />
+        </figure>
+      </section>
+
+      <section class="closer">
+        <h2>Get it</h2>
+        <p class="lede">
+          The download engine is bundled, so Python is not needed. ffmpeg ships with it too.
+        </p>
+        <div class="cta">
+          <a class="btn primary" id="download-2" href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases/latest">
+            <span id="download-label-2">Download for Windows</span>
+          </a>
+          <a class="btn ghost" href="Hexagon-Media-Service-Manual.pdf">Read the manual</a>
+        </div>
+        <p class="meta" id="release-meta-2">Windows 10 and 11, 64-bit.</p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>Hexagon Media Service</span>
+      <nav>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service">Source</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases">Releases</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/issues">Report a problem</a>
+        <a href="Hexagon-Media-Service-Manual.pdf">Manual</a>
+      </nav>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
