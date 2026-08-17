@@ -187,6 +187,10 @@ def build_story():
         "A private desktop downloader for YouTube, Reddit, Twitter/X, HDRezka and "
         "roughly 1800 other sites. Nothing is uploaded, no account is needed, and "
         "every setting stays on your machine."))
+    story.append(para(
+        "Downloads, screenshots and the short version live at "
+        "<font face='Courier'>simplefoxofficial.github.io/Hexagon-Media-Service</font>. "
+        "This manual is the long version."))
     story.append(para("It is three pieces that ship together:"))
     story.append(table([
         ["Piece", "Technology", "What it does"],
@@ -200,13 +204,33 @@ def build_story():
         "the extension over a token-protected port on 127.0.0.1. Only the interface "
         "is web technology; the downloading is all Python."))
 
+    # -------------------------------------------------------------- installing
+    story.append(Paragraph("1. Installing the released build", S["h1"]))
+    story.append(para(
+        "If you only want to use the app, this is the whole of it. Download the "
+        "installer from the releases page and run it. The download engine and ffmpeg "
+        "are both bundled, so Python is not needed and nothing else has to be "
+        "installed first."))
+    story.append(para(
+        "A portable build is published beside it. It cannot update itself, because a "
+        "running executable cannot overwrite its own file on Windows, so it links to "
+        "the release page instead."))
+    story.append(para(
+        "HDRezka is the one feature that needs more: the browser extension in section "
+        "6. Everything else works immediately."))
+    story.append(warn(
+        "The rest of this manual is for building from source. Skip to section 6 if you "
+        "installed the released build."))
+
     # ------------------------------------------------------------ prerequisites
-    story.append(Paragraph("1. What you need first", S["h1"]))
+    story.append(Paragraph("2. Building: what you need first", S["h1"]))
     story.append(table([
         ["Requirement", "Version", "Why"],
         ["Python", "3.10 or newer", "Runs the download engine"],
         ["Node.js and npm", "18 or newer", "Runs and packages the shell"],
-        ["ffmpeg", "any recent", "Merges video with audio, converts audio"],
+        ["ffmpeg", "any recent", "Merges video with audio, converts audio. Bundled "
+                                 "into the packaged build; needed on PATH when "
+                                 "running from source"],
         ["Google Chrome or Edge", "any recent", "Only needed for HDRezka"],
     ], [42 * mm, 30 * mm, 68 * mm]))
     story.append(Spacer(1, 5))
@@ -217,8 +241,8 @@ def build_story():
         "Python from python.org instead and tick <b>Add python.exe to PATH</b>. The "
         "Store build is sandboxed and PyInstaller cannot always read from it."))
 
-    # -------------------------------------------------------------- installing
-    story.append(Paragraph("2. Installing", S["h1"]))
+    # ------------------------------------------------------------ dependencies
+    story.append(Paragraph("3. Installing the dependencies", S["h1"]))
     story.append(Paragraph("Engine dependencies", S["h2"]))
     story.append(code("cd \"D:\\GitHub Repos\\MediaDownloaderProject\"\n"
                       "python -m pip install -r requirements.txt"))
@@ -235,7 +259,7 @@ def build_story():
         "<font face='Courier'>electron.exe</font> into "
         "<font face='Courier'>node_modules/electron/path.txt</font>."))
 
-    story.append(Paragraph("3. Running from source", S["h1"]))
+    story.append(Paragraph("4. Running from source", S["h1"]))
     story.append(para("This is the normal way to use it during development:"))
     story.append(code("cd desktop\nnpm start"))
     story.append(para(
@@ -246,7 +270,7 @@ def build_story():
     story.append(PageBreak())
 
     # ---------------------------------------------------------------- building
-    story.append(Paragraph("4. Building executables", S["h1"]))
+    story.append(Paragraph("5. Building executables", S["h1"]))
     story.append(para(
         "There are two builds. The engine is frozen with PyInstaller, then the shell "
         "is packaged with electron-builder and the engine is bundled inside it."))
@@ -264,10 +288,31 @@ def build_story():
     story.append(Paragraph("Step two: package the shell", S["h2"]))
     story.append(code("cd desktop\nnpm run dist"))
     story.append(para(
-        "Produces an installer and a portable build in "
-        "<font face='Courier'>dist-desktop\\</font>. electron-builder copies "
-        "<font face='Courier'>dist-engine</font> into the app's resources, and the "
+        "Produces an installer, a portable build and "
+        "<font face='Courier'>latest.yml</font> in "
+        "<font face='Courier'>build-output\\</font>. electron-builder copies "
+        "<font face='Courier'>dist-engine</font> and "
+        "<font face='Courier'>vendor\\ffmpeg</font> into the app's resources, and the "
         "shell prefers that frozen engine over your Python install when it finds it."))
+    story.append(para(
+        "If <font face='Courier'>vendor\\ffmpeg</font> is empty, run "
+        "<font face='Courier'>python tools\\stage_ffmpeg.py</font> first. Without it "
+        "the app ships without ffmpeg and can neither merge video with audio nor "
+        "convert audio."))
+
+    story.append(Paragraph("Publishing a release", S["h2"]))
+    story.append(para(
+        "Bump <font face='Courier'>version</font> in "
+        "<font face='Courier'>desktop\\package.json</font> and "
+        "<font face='Courier'>__version__</font> in "
+        "<font face='Courier'>mediadl\\__init__.py</font>, build both steps, then "
+        "publish a GitHub release tagged <font face='Courier'>v&lt;version&gt;</font> "
+        "with all three files attached: the Setup exe, the portable exe and "
+        "<font face='Courier'>latest.yml</font>."))
+    story.append(warn(
+        "<font face='Courier'>latest.yml</font> carries the checksum the updater "
+        "verifies a download against. Leave it off the release and updates still "
+        "install, but only the file size was ever checked."))
 
     story.append(Paragraph("Optional: the icon", S["h2"]))
     story.append(code("python tools\\make_icon.py"))
@@ -279,7 +324,8 @@ def build_story():
     story.append(table([
         ["Command", "Output"],
         ["python -m PyInstaller Engine.spec", "dist-engine\\mediadl-engine.exe"],
-        ["npm run dist", "dist-desktop\\ installer and portable"],
+        ["npm run dist", "build-output\\ installer, portable, latest.yml"],
+        ["python tools\\stage_ffmpeg.py", "vendor\\ffmpeg\\"],
         ["python tools\\make_icon.py", "mediadl\\resources\\app.ico"],
         ["python tools\\make_manual.py", "docs\\Hexagon-Media-Service-Manual.pdf"],
     ], [78 * mm, 62 * mm], code_col=0))
@@ -290,11 +336,16 @@ def build_story():
         "build script does this for you."))
 
     # -------------------------------------------------------------- extension
-    story.append(Paragraph("5. Installing the browser extension", S["h1"]))
+    story.append(Paragraph("6. Installing the browser extension", S["h1"]))
     story.append(para(
         "Only needed for HDRezka. The site refuses requests that do not come from a "
         "real browser, so the page is read inside yours; the extension is the bridge "
         "between that page and the app."))
+    story.append(para(
+        "The same five steps are on the website with a picture for each, in English, "
+        "Russian and Ukrainian: "
+        "<font face='Courier'>simplefoxofficial.github.io/Hexagon-Media-Service/extension.html"
+        "</font>."))
     story.append(steps([
         "Open <font face='Courier'>chrome://extensions</font> and turn on "
         "<b>Developer mode</b> (top right).",
@@ -314,7 +365,7 @@ def build_story():
     story.append(PageBreak())
 
     # ------------------------------------------------------------------ using
-    story.append(Paragraph("6. Using it", S["h1"]))
+    story.append(Paragraph("7. Using it", S["h1"]))
 
     story.append(Paragraph("Downloading from YouTube and most sites", S["h2"]))
     story.append(steps([
@@ -411,25 +462,86 @@ def build_story():
         "title when it has one. Change the pattern in <b>Settings</b>; a broken "
         "pattern falls back to a safe default rather than failing."))
 
-    story.append(Paragraph("Settings worth knowing", S["h2"]))
+    story.append(Paragraph("The Settings panel", S["h2"]))
     story.append(table([
         ["Setting", "What it does"],
+        ["Theme and accent", "Dark or light, and one of five accent colours."],
         ["Simultaneous downloads", "How many run at once. Three is a sensible default."],
-        ["Season folders", "Turn off to keep every episode in one flat folder."],
+        ["Speed limit", "Kilobytes per second across all downloads. 0 is unlimited."],
         ["Expand playlists", "Off means a playlist becomes one item, not many."],
+        ["Season folders", "Turn off to keep every episode in one flat folder."],
+        ["Embed metadata", "Titles, chapters and cover art written into the file."],
         ["Use cookies from", "For age-restricted or members-only videos."],
-        ["Download in chunks", "Leave on. Prevents long transfers dying at HTTP 403."],
-        ["Strict container matching", "Leave off. A known cause of HTTP 403 on YouTube."],
+        ["Updates", "See section 8."],
     ], [46 * mm, 94 * mm]))
+    story.append(Spacer(1, 4))
+    story.append(para(
+        "The engine understands a good deal more than the panel exposes: audio codec "
+        "and bitrate, per-site sub-folders, the filename and episode-name templates, "
+        "subtitle languages, a proxy, retry counts, chunked downloads, strict "
+        "container matching and a download archive. Those are read from "
+        "<font face='Courier'>settings.json</font> at startup - see section 9 for "
+        "where it lives."))
+    story.append(warn(
+        "Two of them are worth leaving alone. <b>Chunked downloads</b> stops long "
+        "transfers dying when a media URL expires, and <b>strict container matching</b> "
+        "is a known cause of HTTP 403 partway through a YouTube download. The defaults "
+        "are the safe ones."))
+
+    story.append(PageBreak())
+
+    # ---------------------------------------------------------------- updates
+    story.append(Paragraph("8. Updates", S["h1"]))
+    story.append(para(
+        "The app checks its own GitHub releases for a newer version. The check is one "
+        "request when the window opens, and it is the only thing the app contacts on "
+        "its own behalf. Nothing is downloaded until you ask for it."))
+
+    story.append(Paragraph("What you see", S["h2"]))
+    story.append(bullets([
+        "A green <b>Update</b> pill appears in the top bar when a newer release "
+        "exists. It is absent the rest of the time.",
+        "<b>Settings &rarr; Updates</b> shows the installed version, when it last "
+        "checked, and a <b>Check now</b> button.",
+        "Either one opens a window with the release notes and, on the installer "
+        "build, a <b>Download and install</b> button.",
+        "After an update installs, the notes for the new version are shown once, "
+        "automatically. <b>View changelog</b> brings them back at any time.",
+    ]))
+
+    story.append(Paragraph("What happens when you install one", S["h2"]))
+    story.append(steps([
+        "The installer for the new version is downloaded to a temporary folder, "
+        "with progress shown in the window.",
+        "It is checked against the size and the SHA-512 checksum published beside "
+        "it in the release. A file that does not match is discarded and nothing is "
+        "installed.",
+        "The installer runs silently, closing the app as it starts.",
+        "The app reopens on the new version. Settings, history and downloads are "
+        "kept.",
+    ]))
+    story.append(warn(
+        "Only the installer build can replace itself. The portable build links to "
+        "the release page instead, because a running executable cannot overwrite its "
+        "own file on Windows. Running from source disables installing entirely."))
+
+    story.append(Paragraph("Turning it off", S["h2"]))
+    story.append(para(
+        "<b>Check for updates when the app starts</b> in Settings. With it off, "
+        "nothing is contacted until you press <b>Check now</b> yourself. The choice, "
+        "the last check time and the last few releases seen are kept in "
+        "<font face='Courier'>updates.json</font> beside your settings, which is what "
+        "lets the changelog still open when GitHub is unreachable."))
 
     story.append(PageBreak())
 
     # ---------------------------------------------------------- troubleshooting
-    story.append(Paragraph("7. When something goes wrong", S["h1"]))
+    story.append(Paragraph("9. When something goes wrong", S["h1"]))
     story.append(para(
-        "The <b>Logs</b> tab shows what the app and yt-dlp actually did, filterable "
-        "by level and text. The same content is written to a rotating file:"))
-    story.append(code("%APPDATA%\\MediaDownloader\\mediadl.log"))
+        "The <b>Logs</b> tab shows what the app and yt-dlp actually did. <b>Copy</b> "
+        "puts the whole buffer on the clipboard and <b>Log folder</b> opens the "
+        "directory holding the rotating file:"))
+    story.append(code("%APPDATA%\\HexagonMediaService\\mediadl.log"))
 
     story.append(Paragraph("Common problems", S["h2"]))
     story.append(table([
@@ -443,8 +555,14 @@ def build_story():
          "<b>Use cookies from</b> back to None. The app warns and carries on "
          "without them."],
         ["HTTP 403 partway through a large download",
-         "The media URL expired. It retries automatically. Keep <b>Download in "
-         "chunks</b> on and <b>Strict container matching</b> off."],
+         "The media URL expired. It retries automatically. If you have edited "
+         "settings.json, leave <font face='Courier'>http_chunk_size_mb</font> "
+         "non-zero and <font face='Courier'>strict_container_match</font> false."],
+        ["<i>ffmpeg: missing</i> in Settings &rarr; About",
+         "Only possible when running from source: install ffmpeg and put it on "
+         "PATH, or set <font face='Courier'>ffmpeg_path</font> in settings.json. "
+         "The packaged build carries its own copy in "
+         "<font face='Courier'>resources\\ffmpeg</font>."],
         ["<i>Could not establish connection</i> from the extension",
          "The content script is not in that tab. Reload the extension at "
          "chrome://extensions, then reload the HDRezka tab once."],
@@ -455,8 +573,9 @@ def build_story():
          "Open the title in your browser and let its check pass, then use the "
          "extension. The app cannot get past it on its own, by design."],
         ["Nothing downloads and the engine dot is red",
-         "The engine did not start. Check Python is on PATH and the requirements "
-         "are installed."],
+         "The engine did not start. In a released build that is a bug worth "
+         "reporting with the log. From source, check Python is on PATH and the "
+         "requirements are installed."],
         ["A download sits on <i>Moving to destination</i> for a long time",
          "It is copying between drives, which is a real copy rather than a rename. "
          "The percentage moves; leave it. Nothing is deleted until the copy is "
@@ -470,14 +589,21 @@ def build_story():
     story.append(Paragraph("Where things live", S["h2"]))
     story.append(table([
         ["What", "Where"],
-        ["Settings", "%APPDATA%\\MediaDownloader\\settings.json"],
-        ["Log file", "%APPDATA%\\MediaDownloader\\mediadl.log"],
-        ["Pairing token", "%APPDATA%\\MediaDownloader\\bridge-token.txt"],
-        ["History", "%APPDATA%\\MediaDownloader\\history.json"],
+        ["Settings", "%APPDATA%\\HexagonMediaService\\settings.json"],
+        ["History", "%APPDATA%\\HexagonMediaService\\history.json"],
+        ["Update state and changelog", "%APPDATA%\\HexagonMediaService\\updates.json"],
+        ["Pairing token", "%APPDATA%\\HexagonMediaService\\bridge-token.txt"],
+        ["Log file", "%APPDATA%\\HexagonMediaService\\mediadl.log"],
         ["Browser staging", "Downloads\\MediaDownloader\\"],
-    ], [38 * mm, 102 * mm], code_col=1))
+    ], [42 * mm, 98 * mm], code_col=1))
+    story.append(Spacer(1, 4))
+    story.append(para(
+        "The folder is migrated from the older <font face='Courier'>MediaDownloader"
+        "</font> name the first time this version runs, so an upgrade keeps its "
+        "settings, history and pairing token. The browser staging folder still uses "
+        "the old name, because it is Chrome that writes there."))
 
-    story.append(Paragraph("8. Keeping it working", S["h1"]))
+    story.append(Paragraph("10. Keeping it working", S["h1"]))
     story.append(para(
         "Sites change their players constantly, so yt-dlp goes stale faster than "
         "anything else here. When downloads that used to work start failing, update "
@@ -485,7 +611,11 @@ def build_story():
     story.append(code("python -m pip install --upgrade yt-dlp"))
     story.append(para(
         "Then rebuild the engine so the packaged app picks it up. The version in use "
-        "is shown in the app's <b>Settings</b> panel under About."))
+        "is shown in the app's <b>Settings</b> panel under About, and on the right of "
+        "the Download page."))
+    story.append(para(
+        "If you are using a released build rather than your own, this is what the "
+        "update in section 8 is for: a new release carries a fresher yt-dlp."))
 
     story.append(Spacer(1, 6 * mm))
     story.append(Paragraph(

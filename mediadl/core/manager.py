@@ -252,7 +252,39 @@ class DownloadManager:
             self._running.add(job_id)
             self.jobChanged.emit(job_id)
             task = DownloadTask(job, self.settings.behaviour, self._signals)
-            self._pool.submit(task.run)
+            future = self._pool.submit(task.run)
+            future.add_done_callback(
+                lambda done, jid=job_id: self._task_returned(jid, done)
+            )
+
+    def _task_returned(self, job_id: int, future) -> None:
+        """Release the slot even if the task never reported a finish.
+
+        A task that raises stores its exception in a Future nobody reads, so
+        without this the job would sit in `_running` for the life of the
+        process and the queue would run one job shorter every time it happened.
+        The task itself is expected to emit `finished`; this only covers the
+        case where it did not.
+        """
+        if job_id not in self._running:
+            return  # the normal path already handled it
+
+        self._running.discard(job_id)
+        try:
+            error = future.exception()
+        except Exception:  # cancelled future
+            error = None
+
+        job = self._jobs.get(job_id)
+        if job is not None and not job.state.is_terminal:
+            job.state = JobState.FAILED
+            job.error = str(error) if error else "the download stopped without reporting why"
+            job.speed = 0.0
+            self.jobChanged.emit(job_id)
+            self.jobFinished.emit(job_id)
+
+        self._pump()
+        self._emit_stats()
 
     # ---------------------------------------------------------------- signals
 

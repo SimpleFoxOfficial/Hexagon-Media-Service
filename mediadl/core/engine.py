@@ -274,6 +274,29 @@ class DownloadTask:
     # -------------------------------------------------------------------- run
 
     def run(self) -> None:
+        """Run the job, and report a finish no matter how it ends.
+
+        Nothing reads the Future this is submitted to, so an exception escaping
+        here is swallowed by the pool and simply never heard from again. The
+        manager would then keep the job in its running set for ever: the queue
+        quietly loses a concurrency slot each time it happens, and after a few
+        it stops starting anything at all. Every exit path must emit.
+        """
+        try:
+            self._run()
+        except Exception as exc:
+            logs.exception(log, f"Job {self.job.id} crashed", exc, job_id=self.job.id)
+            self.signals.finished.emit(
+                self.job.id,
+                {
+                    "state": JobState.FAILED,
+                    "error": _explain(_clean(str(exc))),
+                    "speed": 0.0,
+                    "fragment_text": "",
+                },
+            )
+
+    def _run(self) -> None:
         import yt_dlp
 
         job = self.job
@@ -332,11 +355,24 @@ class DownloadTask:
 
         filepath = _final_path(info)
         if filepath:
-            metadata.apply(
-                filepath,
-                source_url=job.forced_metadata.get("comment") or job.url,
-                extra=job.forced_metadata,
-            )
+            # Tagging is a finishing touch, not the download. The file is
+            # already on disk and complete, so a mutagen failure on an unusual
+            # container is worth a warning and nothing more - reporting the
+            # whole job as failed would be a lie about a file the user has.
+            try:
+                metadata.apply(
+                    filepath,
+                    source_url=job.forced_metadata.get("comment") or job.url,
+                    extra=job.forced_metadata,
+                )
+            except Exception as exc:
+                log.warning(
+                    "Job %s downloaded but could not be tagged: %s",
+                    job.id,
+                    exc,
+                    extra={"job_id": job.id},
+                )
+                self._log(f"Downloaded, but tagging failed: {_clean(str(exc))}")
 
         self.signals.finished.emit(
             job.id,

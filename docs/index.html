@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hexagon Media Service</title>
+    <title data-i18n-doctitle="meta.title">Hexagon Media Service</title>
     <meta
       name="description"
       content="A private desktop downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites. Everything runs locally: no account, no telemetry, nothing uploaded."
@@ -22,7 +22,8 @@
   </head>
 
   <body>
-    <header class="top">
+    <div class="top-wrap" id="top-wrap">
+    <header class="top" id="top-bar">
       <a class="wordmark" href="#top">
         <svg viewBox="0 0 24 24" aria-hidden="true" width="26" height="26">
           <g transform="rotate(2 12 12)">
@@ -37,19 +38,26 @@
       </a>
 
       <nav class="top-nav">
-        <a href="#features">Features</a>
-        <a href="#hdrezka">HDRezka</a>
-        <a href="#private">Private</a>
-        <a href="Hexagon-Media-Service-Manual.pdf">Manual</a>
-        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service">GitHub</a>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#hdrezka" data-i18n="nav.hdrezka">HDRezka</a>
+        <a href="#private" data-i18n="nav.private">Private</a>
+        <a href="Hexagon-Media-Service-Manual.pdf" data-i18n="nav.manual">Manual</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service" data-i18n="nav.github">GitHub</a>
       </nav>
+
+      <div class="lang" role="group" data-i18n-title="nav.language" title="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="uk">UK</button>
+      </div>
     </header>
+    </div>
 
     <main id="top">
       <section class="hero">
-        <p class="eyebrow">Windows desktop app</p>
-        <h1>Download anything.<br />Keep everything.</h1>
-        <p class="lede">
+        <p class="eyebrow" data-i18n="hero.eyebrow">Windows desktop app</p>
+        <h1 data-i18n-html="hero.title">Download anything.<br />Keep everything.</h1>
+        <p class="lede" data-i18n="hero.lede">
           YouTube, HDRezka, Reddit, Twitter and about 1800 other sites, filed and tagged the way you
           want them. Everything runs on your machine: no account, no telemetry, nothing uploaded.
         </p>
@@ -63,7 +71,7 @@
             <span id="download-label">Download for Windows</span>
           </a>
           <a class="btn ghost" id="portable" href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases/latest">
-            Portable build
+            <span id="portable-label">Portable build</span>
           </a>
         </div>
 
@@ -72,6 +80,7 @@
         <figure class="hero-shot" id="hero-shot">
           <img
             src="shots/download-dark.png"
+            data-i18n-alt="hero.shotAlt"
             alt="The Download page: service tabs, a link box, format and destination cards"
             width="1240"
             height="860"
@@ -80,61 +89,55 @@
       </section>
 
       <section class="strip">
-        <div class="strip-item"><b>~1800</b><span>supported sites</span></div>
-        <div class="strip-item"><b>0</b><span>accounts required</span></div>
-        <div class="strip-item"><b>4K</b><span>and everything below it</span></div>
-        <div class="strip-item"><b>Local</b><span>nothing leaves the machine</span></div>
+        <div class="strip-item"><b>~1800</b><span data-i18n="strip.sites">supported sites</span></div>
+        <div class="strip-item"><b>0</b><span data-i18n="strip.accounts">accounts required</span></div>
+        <div class="strip-item"><b>4K</b><span data-i18n="strip.quality">and everything below it</span></div>
+        <div class="strip-item"><b>Local</b><span data-i18n="strip.local">nothing leaves the machine</span></div>
       </section>
 
       <section class="features" id="features">
-        <h2 class="section-title">What it does</h2>
+        <h2 class="section-title" data-i18n="features.title">What it does</h2>
 
         <div class="grid">
           <article class="card">
-            <h3>Many sources</h3>
-            <p>
-              Anything yt-dlp supports, plus a dedicated HDRezka resolver. Paste a link into Auto and
-              the right handler picks it up by itself.
+            <h3 data-i18n="features.sources.title">Many sources</h3>
+            <p data-i18n-html="features.sources.body">
+              Anything yt-dlp supports, plus a dedicated HDRezka resolver.
             </p>
           </article>
 
           <article class="card">
-            <h3>Many ways</h3>
-            <p>
-              Video with audio, audio only or video only. 360p to 4K. MP4, MKV or WEBM; MP3, M4A,
-              Opus, FLAC, WAV or Vorbis at a chosen bitrate.
+            <h3 data-i18n="features.ways.title">Many ways</h3>
+            <p data-i18n-html="features.ways.body">
+              Video with audio, audio only or video only. 360p to 4K.
             </p>
           </article>
 
           <article class="card">
-            <h3>A real queue</h3>
-            <p>
-              Concurrent downloads with pause, resume and retry, live speed and ETA, and a per-item
-              error that says what actually went wrong.
+            <h3 data-i18n="features.queue.title">A real queue</h3>
+            <p data-i18n-html="features.queue.body">
+              Concurrent downloads with pause, resume and retry.
             </p>
           </article>
 
           <article class="card">
-            <h3>Bulk by design</h3>
-            <p>
-              Paste many links at once, or drop in a playlist or channel and have every entry expand
-              into its own queue item.
+            <h3 data-i18n="features.bulk.title">Bulk by design</h3>
+            <p data-i18n-html="features.bulk.body">
+              Paste many links at once, or drop in a playlist or channel.
             </p>
           </article>
 
           <article class="card">
-            <h3>Tagged properly</h3>
-            <p>
-              Title, artist, album, date, chapters, subtitles and cover art are embedded into the
-              finished file, with the source URL written on top.
+            <h3 data-i18n="features.tagged.title">Tagged properly</h3>
+            <p data-i18n-html="features.tagged.body">
+              Title, artist, album, date, chapters, subtitles and cover art are embedded.
             </p>
           </article>
 
           <article class="card">
-            <h3>Filed properly</h3>
-            <p>
-              A season lands as <code>Show / Season 06 / Show - S06E20.mp4</code>, and the exact path
-              is shown before anything is queued.
+            <h3 data-i18n="features.filed.title">Filed properly</h3>
+            <p data-i18n-html="features.filed.body">
+              A season lands as <code>Show / Season 06 / Show 6x20 Dub.mp4</code>.
             </p>
           </article>
         </div>
@@ -142,22 +145,24 @@
 
       <section class="split" id="hdrezka">
         <div class="split-copy">
-          <p class="eyebrow">HDRezka</p>
-          <h2>A whole season, chosen in one place</h2>
-          <p>
-            Load a title, then pick the translation, the quality and any mix of seasons and episodes:
-            select all, a single season, or a range like <code>1-10</code> or <code>3,5,7</code>.
+          <p class="eyebrow" data-i18n="hdrezka.eyebrow">HDRezka</p>
+          <h2 data-i18n="hdrezka.title">A whole season, chosen in one place</h2>
+          <p data-i18n-html="hdrezka.body1">
+            Load a title, then pick the translation, the quality and any mix of seasons and episodes.
           </p>
-          <p>
+          <p data-i18n-html="hdrezka.body2">
             HDRezka refuses direct requests with a bot check, so the page is read inside your own
-            browser through a small extension. Everything after that is decided in the app, and the
-            queue narrates every stage: downloading, waiting for the file, moving, tagging.
+            browser through a small extension.
           </p>
+          <a class="btn ghost small" href="extension.html" data-i18n="hdrezka.guide">
+            How to set up the extension
+          </a>
         </div>
         <figure class="split-shot">
           <img
             src="shots/hdrezka-dark.png"
-            alt="The HDRezka panel: destination, the read-the-open-tab button, and the extension notice"
+            data-i18n-alt="hdrezka.shotAlt"
+            alt="The HDRezka panel"
             width="1240"
             height="642"
           />
@@ -166,21 +171,19 @@
 
       <section class="split reverse">
         <div class="split-copy">
-          <p class="eyebrow">Queue</p>
-          <h2>Everything in flight, in one list</h2>
-          <p>
-            Engine downloads and browser transfers appear side by side, each row patched in place so
-            a running download never redraws the page.
+          <p class="eyebrow" data-i18n="queue.eyebrow">Queue</p>
+          <h2 data-i18n="queue.title">Everything in flight, in one list</h2>
+          <p data-i18n-html="queue.body1">
+            Engine downloads and browser transfers appear side by side.
           </p>
-          <p>
-            Files are moved with the same Win32 call Explorer uses, one at a time, and a transfer is
-            only filed once its size has settled and the byte count matches. A truncated file is
-            refused rather than saved.
+          <p data-i18n-html="queue.body2">
+            Files are moved with the same Win32 call Explorer uses, one at a time.
           </p>
         </div>
         <figure class="split-shot">
           <img
             src="shots/queue-dark.png"
+            data-i18n-alt="queue.shotAlt"
             alt="The Queue page with jobs in several states"
             width="1240"
             height="860"
@@ -190,22 +193,20 @@
 
       <section class="split" id="private">
         <div class="split-copy">
-          <p class="eyebrow">Private by construction</p>
-          <h2>Nothing is uploaded, ever</h2>
-          <p>
-            There is no server side and no account. The only outbound requests are the ones you ask
-            for: the sites you download from, and one check against the GitHub releases API when the
-            app starts, which you can switch off.
+          <p class="eyebrow" data-i18n="private.eyebrow">Private by construction</p>
+          <h2 data-i18n="private.title">Nothing is uploaded, ever</h2>
+          <p data-i18n-html="private.body1">
+            There is no server side and no account.
           </p>
-          <p>
+          <p data-i18n-html="private.body2">
             Updates are downloaded on request and verified against the checksum published beside the
-            installer. Settings, history and logs stay in
-            <code>%APPDATA%\HexagonMediaService</code>.
+            installer.
           </p>
         </div>
         <figure class="split-shot">
           <img
             src="shots/settings-dark.png"
+            data-i18n-alt="private.shotAlt"
             alt="The Settings page showing the Updates card"
             width="1240"
             height="860"
@@ -214,15 +215,17 @@
       </section>
 
       <section class="closer">
-        <h2>Get it</h2>
-        <p class="lede">
+        <h2 data-i18n="closer.title">Get it</h2>
+        <p class="lede" data-i18n="closer.lede">
           The download engine is bundled, so Python is not needed. ffmpeg ships with it too.
         </p>
         <div class="cta">
           <a class="btn primary" id="download-2" href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases/latest">
             <span id="download-label-2">Download for Windows</span>
           </a>
-          <a class="btn ghost" href="Hexagon-Media-Service-Manual.pdf">Read the manual</a>
+          <a class="btn ghost" href="Hexagon-Media-Service-Manual.pdf" data-i18n="closer.manual">
+            Read the manual
+          </a>
         </div>
         <p class="meta" id="release-meta-2">Windows 10 and 11, 64-bit.</p>
       </section>
@@ -231,13 +234,14 @@
     <footer class="foot">
       <span>Hexagon Media Service</span>
       <nav>
-        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service">Source</a>
-        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases">Releases</a>
-        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/issues">Report a problem</a>
-        <a href="Hexagon-Media-Service-Manual.pdf">Manual</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service" data-i18n="foot.source">Source</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases" data-i18n="foot.releases">Releases</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/issues" data-i18n="foot.issues">Report a problem</a>
+        <a href="Hexagon-Media-Service-Manual.pdf" data-i18n="foot.manual">Manual</a>
       </nav>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

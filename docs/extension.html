@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n-doctitle="guide.meta.title">Setting up the HDRezka extension</title>
+    <meta name="description" content="How to add the browser extension that lets Hexagon Media Service download from HDRezka." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="top-wrap" id="top-wrap">
+    <header class="top" id="top-bar">
+      <a class="wordmark" href="index.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="26" height="26">
+          <g transform="rotate(2 12 12)">
+            <rect x="3" y="4.6" width="18" height="14.8" rx="1.9" fill="#c8cbd2" />
+            <rect x="4.6" y="8.1" width="14.8" height="7.8" rx="1.1" fill="#09de78" />
+            <g stroke="#0b0c0e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M12 9.2v4.2M9.9 11.5 12 13.7l2.1-2.2M9.4 14.9h5.2" />
+            </g>
+          </g>
+        </svg>
+        <span>Hexagon Media Service</span>
+      </a>
+
+      <nav class="top-nav">
+        <a href="index.html" data-i18n="guide.back">Back to the site</a>
+        <a href="Hexagon-Media-Service-Manual.pdf" data-i18n="nav.manual">Manual</a>
+      </nav>
+
+      <div class="lang" role="group" data-i18n-title="nav.language" title="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="uk">UK</button>
+      </div>
+    </header>
+    </div>
+
+    <main class="guide">
+      <!-- Only shown when the page was opened by the download button. -->
+      <section class="downloading hidden" id="downloading">
+        <div class="downloading-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v11M7.5 10.5 12 15l4.5-4.5M4 20h16" />
+          </svg>
+        </div>
+        <div class="downloading-copy">
+          <h2 data-i18n="guide.downloading.title">Your download is starting</h2>
+          <p data-i18n="guide.downloading.body">
+            Keep this page open. It takes five minutes to set up HDRezka, and you can do it while
+            the file arrives.
+          </p>
+          <a class="retry" id="retry" href="#" data-i18n="guide.downloading.retry">
+            Download did not start? Click here.
+          </a>
+        </div>
+      </section>
+
+      <header class="guide-head">
+        <p class="eyebrow" data-i18n="guide.time">About five minutes, once.</p>
+        <h1 data-i18n="guide.title">Setting up HDRezka</h1>
+        <p class="lede" data-i18n="guide.lede">
+          HDRezka blocks anything that is not a real browser.
+        </p>
+      </header>
+
+      <!-- ------------------------------------------------------------ 1 -->
+      <section class="step">
+        <div class="step-number">1</div>
+        <div class="step-body">
+          <h2 data-i18n="guide.step1.title">Install the app</h2>
+          <p data-i18n-html="guide.step1.body">Run the file you just downloaded.</p>
+          <p class="note" data-i18n-html="guide.step1.note">The folder is always here:</p>
+          <div class="copyrow">
+            <code id="path">%LOCALAPPDATA%\Programs\Hexagon Media Service\resources\extension</code>
+            <button class="copybtn" type="button" data-copy="path" data-i18n="guide.copy">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------ 2 -->
+      <section class="step">
+        <div class="step-number">2</div>
+        <div class="step-body">
+          <h2 data-i18n="guide.step2.title">Open your browser's extensions page</h2>
+          <p data-i18n-html="guide.step2.body">Copy the address below into the address bar.</p>
+          <div class="copyrow">
+            <code id="addr">chrome://extensions</code>
+            <button class="copybtn" type="button" data-copy="addr" data-i18n="guide.copy">Copy</button>
+          </div>
+          <p class="note" data-i18n-html="guide.step2.note">Then turn on Developer mode.</p>
+
+          <figure class="draw">
+            <svg viewBox="0 0 640 190" role="img" data-i18n-alt="guide.step2.alt"
+              aria-label="A browser address bar with the extensions address typed in">
+              <rect x="1" y="1" width="638" height="188" rx="10" class="d-window" />
+              <circle cx="26" cy="24" r="5" class="d-dot" />
+              <circle cx="44" cy="24" r="5" class="d-dot" />
+              <circle cx="62" cy="24" r="5" class="d-dot" />
+              <rect x="86" y="12" width="150" height="24" rx="6" class="d-tab" />
+              <text x="100" y="29" class="d-label" data-i18n="guide.ui.extensions">Extensions</text>
+
+              <rect x="20" y="48" width="600" height="30" rx="15" class="d-bar" />
+              <text x="40" y="68" class="d-mono">chrome://extensions</text>
+              <rect x="20" y="48" width="600" height="30" rx="15" class="d-focus" />
+
+              <text x="24" y="112" class="d-title" data-i18n="guide.ui.extensions">Extensions</text>
+
+              <!-- Anchored at its right edge: the translated label is half as
+                   long again and would otherwise run into the switch. -->
+              <text x="556" y="117" class="d-label" text-anchor="end" data-i18n="guide.ui.devMode">Developer mode</text>
+              <rect x="566" y="103" width="44" height="22" rx="11" class="d-switch-on" />
+              <circle cx="599" cy="114" r="8" class="d-knob" />
+              <path d="M556 132 l-14 16" class="d-arrow" marker-end="url(#head)" />
+
+              <rect x="24" y="140" width="592" height="34" rx="8" class="d-panel" />
+              <text x="44" y="161" class="d-muted">Hexagon Media Service Bridge</text>
+
+              <defs>
+                <marker id="head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5"
+                  markerHeight="5" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="d-arrowhead" />
+                </marker>
+              </defs>
+            </svg>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------ 3 -->
+      <section class="step">
+        <div class="step-number">3</div>
+        <div class="step-body">
+          <h2 data-i18n="guide.step3.title">Load the folder</h2>
+          <p data-i18n-html="guide.step3.body">Press Load unpacked and choose the folder.</p>
+          <p class="note" data-i18n-html="guide.step3.note">Pick the folder itself, not a file inside it.</p>
+
+          <figure class="draw">
+            <svg viewBox="0 0 640 200" role="img" data-i18n-alt="guide.step3.alt"
+              aria-label="The Load unpacked button and a folder picker">
+              <rect x="1" y="1" width="638" height="198" rx="10" class="d-window" />
+
+              <!-- Wide enough for the Russian and Ukrainian labels, which are
+                   about two and a half times the length of the English. -->
+              <rect x="20" y="18" width="244" height="30" rx="8" class="d-button-primary" />
+              <text x="142" y="38" class="d-btn-label on-brand" text-anchor="middle"
+                data-i18n="guide.ui.loadUnpacked">Load unpacked</text>
+              <rect x="276" y="18" width="164" height="30" rx="8" class="d-button" />
+              <text x="358" y="38" class="d-btn-label" text-anchor="middle"
+                data-i18n="guide.ui.pack">Pack extension</text>
+              <rect x="452" y="18" width="112" height="30" rx="8" class="d-button" />
+              <text x="508" y="38" class="d-btn-label" text-anchor="middle"
+                data-i18n="guide.ui.update">Update</text>
+
+              <path d="M142 58 l0 22" class="d-arrow" marker-end="url(#head3)" />
+
+              <rect x="120" y="86" width="400" height="98" rx="10" class="d-dialog" />
+              <rect x="120" y="86" width="400" height="26" rx="10" class="d-dialog-head" />
+              <rect x="136" y="124" width="18" height="14" rx="3" class="d-folder" />
+              <text x="164" y="136" class="d-label" data-i18n="guide.ui.folderName">extension</text>
+              <rect x="130" y="118" width="380" height="26" rx="6" class="d-selected" />
+              <rect x="136" y="152" width="18" height="14" rx="3" class="d-folder-dim" />
+              <text x="164" y="164" class="d-muted">lib</text>
+              <rect x="386" y="150" width="120" height="24" rx="7" class="d-button-primary" />
+              <text x="446" y="166" class="d-btn-label on-brand" text-anchor="middle"
+                data-i18n="guide.ui.selectFolder">Select folder</text>
+
+              <defs>
+                <marker id="head3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5"
+                  markerHeight="5" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="d-arrowhead" />
+                </marker>
+              </defs>
+            </svg>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------ 4 -->
+      <section class="step">
+        <div class="step-number">4</div>
+        <div class="step-body">
+          <h2 data-i18n="guide.step4.title">Copy the pairing token from the app</h2>
+          <p data-i18n-html="guide.step4.body">Open the app, go to Download, then HDRezka.</p>
+          <figure class="draw shot">
+            <img src="shots/pairing-dark.png" data-i18n-alt="guide.step4.alt"
+              alt="The Browser bridge panel in the app" width="960" height="224" />
+          </figure>
+          <p class="note warn" data-i18n-html="guide.step4.note">
+            The token is what stops any web page you visit from talking to the app.
+          </p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------ 5 -->
+      <section class="step">
+        <div class="step-number">5</div>
+        <div class="step-body">
+          <h2 data-i18n="guide.step5.title">Paste it into the extension</h2>
+          <p data-i18n-html="guide.step5.body">Open the extension's options and paste the token.</p>
+
+          <figure class="draw">
+            <svg viewBox="0 0 640 190" role="img" data-i18n-alt="guide.step5.alt"
+              aria-label="The extension options page with the token pasted in">
+              <rect x="1" y="1" width="638" height="188" rx="10" class="d-window" />
+              <text x="24" y="34" class="d-title">Hexagon Media Service Bridge</text>
+
+              <text x="24" y="66" class="d-muted">App address</text>
+              <rect x="24" y="74" width="592" height="28" rx="7" class="d-input" />
+              <text x="38" y="93" class="d-mono">http://127.0.0.1:47615</text>
+
+              <text x="24" y="124" class="d-muted">Pairing token</text>
+              <rect x="24" y="132" width="592" height="28" rx="7" class="d-input-focus" />
+              <text x="38" y="151" class="d-mono">................................</text>
+
+              <rect x="24" y="168" width="0" height="0" />
+              <rect x="470" y="106" width="146" height="26" rx="13" class="d-pill-ok" />
+              <text x="543" y="123" class="d-ok" text-anchor="middle">Connected</text>
+              <rect x="24" y="166" width="132" height="0" />
+            </svg>
+          </figure>
+          <p class="note" data-i18n-html="guide.step5.note">It should say Connected.</p>
+        </div>
+      </section>
+
+      <section class="done">
+        <h2 data-i18n="guide.done.title">Using it</h2>
+        <p data-i18n-html="guide.done.body">
+          Open any film or series on HDRezka in your browser and leave the tab open.
+        </p>
+      </section>
+
+      <section class="trouble">
+        <h2 data-i18n="guide.trouble.title">If something does not work</h2>
+        <dl>
+          <dt data-i18n="guide.trouble.q1">The app says the extension is not connected</dt>
+          <dd data-i18n="guide.trouble.a1">Copy the token again.</dd>
+          <dt data-i18n="guide.trouble.q2">Could not establish connection</dt>
+          <dd data-i18n="guide.trouble.a2">Reload the HDRezka tab once.</dd>
+          <dt data-i18n="guide.trouble.q3">This does not look like an HDRezka title page</dt>
+          <dd data-i18n="guide.trouble.a3">Open the film or series itself first.</dd>
+          <dt data-i18n="guide.trouble.q4">The extensions page will not open from a link</dt>
+          <dd data-i18n="guide.trouble.a4">Copy the address and paste it in yourself.</dd>
+        </dl>
+        <p class="note">
+          <a href="Hexagon-Media-Service-Manual.pdf" data-i18n="guide.trouble.more">
+            The manual covers the rest.
+          </a>
+        </p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>Hexagon Media Service</span>
+      <nav>
+        <a href="index.html" data-i18n="guide.back">Back to the site</a>
+        <a href="https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/issues" data-i18n="foot.issues">Report a problem</a>
+        <a href="Hexagon-Media-Service-Manual.pdf" data-i18n="foot.manual">Manual</a>
+      </nav>
+    </footer>
+
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

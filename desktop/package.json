@@ -1,6 +1,6 @@
 {
   "name": "hexagon-media-service",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Electron shell for Hexagon Media Service. The interface is web; the engine is Python.",
   "main": "src/main/main.js",

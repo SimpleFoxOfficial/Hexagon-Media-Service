@@ -4,117 +4,155 @@ A private desktop downloader for YouTube, HDRezka, Reddit, Twitter/X and roughly
 1800 other sites. Everything runs locally: no account, no telemetry, no upload.
 Built because online converter sites are slow, ad-ridden and untrustworthy.
 
-![Material 3 interface, light and dark](docs/screenshot-dark.png)
+**[simplefoxofficial.github.io/Hexagon-Media-Service](https://simplefoxofficial.github.io/Hexagon-Media-Service/)**
+- downloads, screenshots and the short version.
+
+![The Download page](docs/shots/download-dark.png)
 
 ## What it does
 
-- **A tab per service.** Auto detect, YouTube and HDRezka each get their own
-  panel, because they do not need the same options. Paste an HDRezka link into
-  Auto and it hands off to the HDRezka tab by itself.
+- **A tab per service.** Auto detect, YouTube, HDRezka, Reddit, Twitter/X and
+  everything else. HDRezka gets a panel of its own, because picking a dub and a
+  spread of episodes has nothing in common with pasting a link.
 - **HDRezka in bulk.** Load a title, then pick the translation (dub), the
-  quality, and any mix of seasons and episodes: All, Latest season, or a range
-  like `1-10` or `3,5,7`. Subtitles and tagging are per-title switches.
+  quality, and any mix of seasons and episodes: select all, a whole season, or a
+  range like `1-10` or `3,5,7`.
 - **Series get filed properly.** A season downloads as
-  `Show / Season 06 / Show - S06E20.mp4`, and the panel previews the exact path
+  `Show / Season 06 / Show 6x20 Dub.mp4`, and the panel previews the exact path
   before anything is queued.
 - **Many sources.** Anything yt-dlp supports, plus a dedicated HDRezka resolver.
 - **Many ways.** Video with audio, audio only, or video only. Quality from 360p
   to 4K. MP4, MKV or WEBM containers; MP3, M4A, Opus, FLAC, WAV or Vorbis audio
   at a chosen bitrate.
-- **Bulk.** Paste many links at once, import a `.txt` list, or drop in a
-  playlist or channel URL and have every entry expand into its own queue item.
+- **Bulk.** Paste many links at once, or drop in a playlist or channel URL and
+  have every entry expand into its own queue item.
 - **Metadata.** Title, artist, album, date, chapters, subtitles and cover art
   are embedded into the finished file. Source URL and download date are written
   as extra tags on top of what ffmpeg produces.
 - **Organised output.** Optional per-media-type and per-site sub-folders, plus a
   configurable yt-dlp filename template.
-- **A real queue.** Concurrent downloads with pause, resume, retry, per-item
-  logs, speed and ETA.
+- **A real queue.** Concurrent downloads with pause, resume, retry, live speed
+  and ETA, and a per-item error that says what actually went wrong.
 - **Updates itself.** The app checks GitHub for a new release, shows the notes,
   and installs it on request: the download is verified against the checksum
   published beside it, and the app reopens on the new version. It also shows
   what changed the first time a new version starts. The check is one request on
   launch and can be turned off in Settings; nothing is downloaded until asked.
 
-## Look and feel
+## Shape of the thing
 
-Two design languages, switchable in Settings:
+Three pieces, three languages, one window.
 
-- **Studio** (default) matches the sibling Modpack-Utility app: flat neutral
-  surfaces, muted accents, 7px radii, thin dividers and progress bars.
-- **Vibrant** is the saturated Material 3 treatment, with pill buttons and
-  tonal containers.
+| Piece | Lives in | Job |
+| --- | --- | --- |
+| Shell | `desktop/` | Electron. The window and the whole interface. |
+| Engine | `mediadl/` | Python. yt-dlp, tagging, file filing. Headless. |
+| Extension | `extension/` | Chrome MV3. Reads HDRezka pages. Only used there. |
 
-Either way the whole scheme is generated at runtime from one seed colour. Tonal
-palettes are computed in OkLCh and gamut-mapped per tone, so any accent stays
-legible in both light and dark. Body text is Segoe UI; the logo is Comfortaa.
+The shell spawns the engine and talks newline-delimited JSON over stdio. The
+engine also runs a token-protected HTTP server on 127.0.0.1 that the extension
+talks to. Only the interface is web technology; all downloading is Python.
 
-Also adjustable: theme mode (including following Windows), accent colour, corner
-rounding, comfortable or compact density, text size, interface font, animations
-and queue thumbnails.
+The renderer is plain ES modules - no bundler, no framework. Job rows are
+patched in place, so a running download does not re-render the window every
+tick.
 
-## When something fails
+## Installing
 
-The **Logs** tab shows what the app and yt-dlp actually did, filterable by level
-and text, with a verbose switch. The same stream goes to
-`%APPDATA%\MediaDownloader\mediadl.log`, which rotates. Failures in the queue
-carry a plain-language explanation rather than only the raw error.
+Grab the installer from the
+[releases page](https://github.com/SimpleFoxOfficial/Hexagon-Media-Service/releases)
+and run it. The download engine and ffmpeg are both bundled, so Python is not
+needed.
 
-Two failures are worth knowing about in advance:
+There is also a portable build. It cannot update itself - a running exe cannot
+overwrite its own file on Windows - so it links to the release page instead.
 
-**HDRezka answers with an anti-bot page.** It returns HTTP 200 with a short
-"checking that you are not a bot" body, so nothing can be parsed from it. Open
-the title in your browser, let its check pass, then set
-**Settings > Network > Use cookies from** to that browser; those cookies are
-reused for HDRezka. There is no way around the check itself. A mirror host can
-also be set in Settings > Advanced.
+HDRezka additionally needs the browser extension; the installer offers to open
+its folder on the finish page. Load that folder at `chrome://extensions` with
+**Developer mode** on, then pair it from **Download > HDRezka** in the app.
 
-**YouTube returns 403 partway through a large download.** YouTube forces SABR
-streaming, and asking for a specific container during selection steers it onto
-clients that drop the transfer. Selection is by resolution only and the
-container is produced by remuxing afterwards, which avoids it; downloads are
-also chunked so an expiring URL does not kill a multi-gigabyte transfer, and a
-403 is retried with a fresh URL, resuming from the partial file.
+## Running from source
 
-## Running it
-
-**From the executable**
-
-Grab `dist\MediaDownloader.exe` and double-click it. Nothing to install.
-
-**From source**
+Requires Python 3.10+, Node 18+, and ffmpeg on `PATH`.
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
 ```bash
-python run.py
+cd desktop && npm install
 ```
-
-Requires Python 3.10+ and ffmpeg on `PATH` (or set its location in Settings).
-ffmpeg is needed to merge video with audio and to convert audio formats.
-
-## Building the executable
 
 ```bash
-powershell -ExecutionPolicy Bypass -File .\build.ps1
+cd desktop && npm start
 ```
 
-Produces a single `dist\MediaDownloader.exe`, around 56 MB.
+The window opens and the engine starts automatically as a child process; never
+launch it separately. Add `-- --dev` to open devtools.
 
-| Flag | Effect |
+## Building
+
+Two steps: freeze the engine, then package the shell around it.
+
+```bash
+python -m PyInstaller Engine.spec --noconfirm --distpath dist-engine --workpath build-engine
+```
+
+```bash
+cd desktop && npx --no-install electron-builder --win
+```
+
+Both artefacts land in `build-output/`: an installer, a portable exe, and the
+`latest.yml` the updater checks a download against. Attach all three to a
+release tagged `v<version>`.
+
+| Command | Output |
 | --- | --- |
-| `-OneDir` | Folder build instead of one file. Starts faster. |
-| `-WithFfmpeg` | Copies `ffmpeg.exe` from `PATH` into the bundle. |
-| `-SkipIcon` | Reuses the existing `app.ico`. |
+| `python -m PyInstaller Engine.spec ...` | `dist-engine\mediadl-engine.exe` |
+| `npx electron-builder --win` | `build-output\` installer and portable |
+| `python tools/make_icon.py` | `mediadl\resources\app.ico` |
+| `python tools/make_manual.py` | `docs\Hexagon-Media-Service-Manual.pdf` |
+| `python tools/stage_ffmpeg.py` | `vendor\ffmpeg\` |
 
-To change the app icon, edit the logo and run `python tools/make_icon.py`.
+The version comes from `desktop/package.json`; `mediadl/__init__.py` carries the
+engine's own and the two are kept in step.
 
-> If PyInstaller fails, check whether you are on the Microsoft Store build of
-> Python. It installs into a sandboxed location that PyInstaller cannot always
-> read. Installing Python from python.org resolves it. The build script warns
-> about this up front.
+## Settings
+
+The panel covers what most people change: theme and accent, simultaneous
+downloads, speed limit, playlist expansion, season folders, metadata embedding,
+which browser to take cookies from, and updates.
+
+The engine understands a good deal more than the panel exposes - audio codec and
+bitrate, per-site sub-folders, filename and episode templates, subtitle
+languages, proxy, retries, a download archive. Those live in `settings.json` and
+are read on start. Settings load forgivingly: unknown keys are dropped and
+malformed values fall back to defaults, so a file written by another build will
+never stop the app from starting.
+
+## When something fails
+
+The **Logs** tab shows what the app and yt-dlp actually did, and can copy the
+whole buffer or open the folder holding the rotating log file. Failures in the
+queue carry a plain-language explanation rather than only the raw error.
+
+Three failures are worth knowing about in advance.
+
+**HDRezka answers with an anti-bot page.** It returns HTTP 200 with a short
+"checking that you are not a bot" body, so nothing can be parsed from it. This
+is exactly why the extension exists: your browser has already passed that check,
+so the page is read there and handed to the app. Nothing here tries to solve it
+programmatically.
+
+**YouTube returns 403 partway through a large download.** YouTube forces SABR
+streaming, and asking for a specific container during selection steers it onto
+clients that drop the transfer. Selection is by resolution only and the
+container is produced by remuxing afterwards, which avoids it; downloads are
+also chunked so an expiring URL does not kill a multi-gigabyte transfer.
+
+**Cookies from a running Chrome cannot be read.** Chrome holds an exclusive lock
+on its cookie database. The app resolves cookies once into a file and carries on
+with a warning rather than failing the download.
 
 ## Keeping it working
 
@@ -126,79 +164,76 @@ fine in a browser, that is almost always the cause:
 python -m pip install --upgrade yt-dlp
 ```
 
-Then rebuild the exe. The About screen shows the bundled yt-dlp version.
-
-## Fonts
-
-Body text is Segoe UI, which ships with Windows. The logo is Comfortaa, bundled
-in `mediadl/resources/fonts/` under the SIL Open Font License 1.1 with its
-licence text alongside.
-
-Any other `.ttf` or `.otf` dropped in that folder is registered at startup. If
-the Comfortaa file is removed the logo falls back to the interface font and
-nothing else changes; Settings reports which is in use.
+Then rebuild the engine. **Settings > About** shows the version in use.
 
 ## Where things live
 
 | What | Where |
 | --- | --- |
-| Settings | `%APPDATA%\MediaDownloader\settings.json` |
-| History | `%APPDATA%\MediaDownloader\history.json` |
-| Download archive | `%APPDATA%\MediaDownloader\download-archive.txt` |
+| Settings | `%APPDATA%\HexagonMediaService\settings.json` |
+| History | `%APPDATA%\HexagonMediaService\history.json` |
+| Update state and changelog | `%APPDATA%\HexagonMediaService\updates.json` |
+| Extension pairing token | `%APPDATA%\HexagonMediaService\bridge-token.txt` |
+| Log file | `%APPDATA%\HexagonMediaService\mediadl.log` |
+| Browser staging | `Downloads\MediaDownloader\` |
 | Downloads | your Downloads folder, unless changed |
 
-Settings are written atomically and load forgivingly: unknown keys are dropped
-and malformed values fall back to defaults, so a settings file from a different
-build will not stop the app from starting.
+The folder is migrated from the older `MediaDownloader` name on first run, so an
+upgrade keeps its settings, history and pairing token.
+
+Files fetched by the browser for HDRezka land in the staging folder first, then
+the app moves them to the real destination. Chrome refuses to write anywhere
+else; the staging folder is a waypoint, not a leftover.
 
 ## Layout
 
 ```
+desktop/
+  src/main/       Electron main: window, engine bridge, updater
+  src/preload/    the only surface the renderer gets
+  src/renderer/   plain ES modules, no bundler
+  installer/      NSIS customisation
 mediadl/
-  app.py              application bootstrap
-  config.py           typed settings, JSON persistence
-  paths.py            appdata, resources, ffmpeg discovery
+  daemon.py       the JSON-over-stdio protocol
+  config.py       typed settings, JSON persistence
+  paths.py        appdata, resources, ffmpeg discovery
+  bridge_server.py  token-protected 127.0.0.1 server for the extension
   core/
-    job.py            Job model and states
-    presets.py        preset -> yt-dlp options
-    engine.py         URL expansion and the download worker
-    manager.py        queue, concurrency, history
-    metadata.py       mutagen tagging
-    sources/          resolver registry (generic + HDRezka)
-  ui/
-    color.py          OkLab/OkLCh maths, tonal palettes
-    theme.py          Material 3 schemes and the Qt style sheet
-    icons.py          vector icon set
-    widgets.py        cards, switches, chips, thumbnails, toasts
-    views/            download, queue, settings, about
-    dialogs/          HDRezka series picker
-tools/make_icon.py    generates app.ico from the logo
+    job.py        Job model and states
+    presets.py    preset -> yt-dlp options
+    engine.py     URL expansion and the download worker
+    manager.py    queue, concurrency, history
+    metadata.py   mutagen tagging
+    filing.py     verified moves through the Win32 copy API
+    text.py       repairs mis-decoded dub names
+    sources/      resolver registry (generic + HDRezka)
+extension/        Chrome MV3, HDRezka only
+docs/             the project page, served by GitHub Pages, and the manual
+tools/            icon, manual and ffmpeg staging scripts
 ```
 
-Downloads run on a `QThreadPool`. Workers never touch widgets; they emit Qt
-signals which cross to the GUI thread as queued connections.
+`run.py`, `build.ps1`, `MediaDownloader.spec` and `mediadl/ui/` belong to the
+retired PySide6 interface. They still import but are not part of the app.
 
-## Keyboard
+## The window
 
-| Keys | Action |
-| --- | --- |
-| `Ctrl+1` / `Ctrl+2` | Download / Queue |
-| `Ctrl+,` | Settings |
-| `Ctrl+V` | Paste links into the input |
-| `Ctrl+Enter` | Add to queue |
+It draws its own titlebar, so the window controls sit at the right of the top
+bar. Drag the empty strip to move it, double-click to maximise, `F11` toggles
+fullscreen and `Esc` leaves it.
 
-You can also pass links straight to the executable:
+## Fonts
 
-```bash
-MediaDownloader.exe "https://www.youtube.com/watch?v=..."
-```
+Body text is Inter, falling back to Segoe UI. The wordmark is Comfortaa, bundled
+in `desktop/src/renderer/fonts/` under the SIL Open Font License 1.1 with its
+licence text alongside, so it packs into the asar and resolves identically in
+development and in the installed app.
 
 ## Built on
 
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) for extraction,
 [HdRezkaApi](https://github.com/SuperZombi/HdRezkaApi) for HDRezka,
 [mutagen](https://github.com/quodlibet/mutagen) for tagging,
-[PySide6](https://doc.qt.io/qtforpython-6/) for the interface, and ffmpeg for
-muxing and conversion.
+[Electron](https://www.electronjs.org/) for the window, and ffmpeg for muxing
+and conversion.
 
 Download only what you have the right to download.

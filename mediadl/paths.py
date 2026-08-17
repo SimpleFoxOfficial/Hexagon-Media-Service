@@ -124,11 +124,20 @@ def find_ffmpeg(hint: str = "") -> Path | None:
 
     # Packaged layout is resources/engine/mediadl-engine.exe alongside
     # resources/ffmpeg/, so the sibling directory is checked as well as our own.
+    #
+    # Searching from bundle_dir() alone never reached it. This is a onefile
+    # PyInstaller build, so when frozen that returns the _MEIPASS extraction
+    # directory in %TEMP%, and resources/ffmpeg is nowhere near it: the bundled
+    # copy was invisible and only an ffmpeg already on PATH was ever found.
+    # The executable's own location is what the packaged layout is relative to.
     root = bundle_dir()
+    exe_dir = Path(sys.executable).parent if is_frozen() else root
     for candidate in (
         root / "ffmpeg" / "ffmpeg.exe",
         root.parent / "ffmpeg" / "ffmpeg.exe",
-        root.parent.parent / "ffmpeg" / "ffmpeg.exe",
+        exe_dir / "ffmpeg" / "ffmpeg.exe",
+        exe_dir.parent / "ffmpeg" / "ffmpeg.exe",
+        exe_dir.parent.parent / "ffmpeg" / "ffmpeg.exe",
     ):
         if candidate.exists():
             return candidate

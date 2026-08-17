@@ -1,6 +1,6 @@
 """Media Downloader - a local, private downloader for YouTube, HDRezka, Reddit, Twitter and friends."""
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 APP_NAME = "Hexagon Media Service"
 APP_ID = "HexagonMediaService"
 

@@ -91,11 +91,28 @@ code {
 
 /* ------------------------------------------------------------------ header */
 
+/*
+ * The bar follows the page down. It starts transparent so it sits inside the
+ * hero, and grows a background and a rule only once the page has moved under
+ * it - a permanently opaque strip over the hero would cut the glow in half.
+ */
+.top-wrap {
+  position: sticky; top: 0; z-index: 40;
+  transition: background 200ms ease, border-color 200ms ease, backdrop-filter 200ms ease;
+  border-bottom: 1px solid transparent;
+}
+.top-wrap.scrolled {
+  background: rgba(15, 17, 19, 0.82);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom-color: var(--surface-4);
+}
+
 .top {
   display: flex; align-items: center; gap: 2rem;
   max-width: var(--max);
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 0;
+  padding: 1.1rem 1.5rem;
 }
 .wordmark {
   display: inline-flex; align-items: center; gap: 0.6rem;
@@ -269,12 +286,159 @@ code {
 
 /* ----------------------------------------------------------------- narrow */
 
+/* ------------------------------------------------------- language switcher */
+
+.lang { display: flex; gap: 0.15rem; padding: 0.2rem; border-radius: 9999px; background: var(--surface-3); }
+.lang button {
+  padding: 0.3rem 0.6rem;
+  border: none; background: none;
+  border-radius: 9999px;
+  color: var(--text-dim);
+  font: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.lang button:hover { color: var(--text-bright); }
+.lang button.active { background: var(--brand-dim); color: var(--brand); }
+
+.btn.small { padding: 0.6rem 1.1rem; font-size: 0.875rem; }
+
+/* =================================================== extension guide page */
+
+.guide { max-width: 860px; margin: 0 auto; padding: 3rem 1.5rem 0; }
+
+.downloading {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid rgba(9, 222, 120, 0.35);
+  border-radius: var(--radius);
+  background: var(--brand-dim);
+  margin-bottom: 3rem;
+}
+.downloading-icon {
+  flex: 0 0 42px; height: 42px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(9, 222, 120, 0.16); color: var(--brand);
+}
+.downloading-copy h2 { font-size: 1.05rem; margin-bottom: 0.25rem; }
+.downloading-copy p { color: var(--text); font-size: 0.94rem; }
+.retry {
+  display: inline-block; margin-top: 0.5rem;
+  color: var(--brand); font-size: 0.86rem; text-decoration: none;
+}
+.retry:hover { text-decoration: underline; }
+
+.guide-head { margin-bottom: 3.5rem; }
+.guide-head h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0.75rem 0 1rem; }
+.guide-head .lede { margin: 0; }
+
+.step {
+  display: grid; grid-template-columns: 46px minmax(0, 1fr);
+  gap: 1.4rem;
+  padding-bottom: 3rem;
+}
+.step-number {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--surface-3); border: 1px solid var(--surface-5);
+  color: var(--brand); font-weight: 600; font-size: 1rem;
+}
+.step-body h2 { font-size: 1.3rem; margin-bottom: 0.6rem; }
+.step-body p { color: var(--text-dim); margin-bottom: 0.85rem; }
+.step-body b { color: var(--text-bright); font-weight: 600; }
+.note { font-size: 0.9rem; }
+.note.warn {
+  padding: 0.8rem 1rem;
+  border-left: 3px solid var(--brand);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-2);
+}
+
+.copyrow {
+  display: flex; align-items: stretch; gap: 0.5rem;
+  margin: 0.6rem 0 1rem;
+}
+.copyrow code {
+  flex: 1; min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--surface-4); border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--text-bright);
+  font-family: var(--mono); font-size: 0.84rem;
+  overflow-x: auto; white-space: nowrap;
+}
+.copybtn {
+  flex: 0 0 auto;
+  padding: 0 1.1rem;
+  border: none; border-radius: var(--radius-sm);
+  background: var(--surface-4); color: var(--text-bright);
+  font: inherit; font-size: 0.84rem; font-weight: 500; cursor: pointer;
+  transition: background 140ms ease;
+}
+.copybtn:hover { background: var(--surface-5); }
+.copybtn.done { background: var(--brand); color: #06100b; }
+
+.draw { margin: 1.25rem 0 0.5rem; }
+.draw svg, .draw img {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--radius-sm);
+}
+.draw.shot img { border: 1px solid var(--surface-4); }
+
+/* The illustrations are diagrams of someone else's UI, drawn in our palette. */
+.d-window { fill: var(--surface-2); stroke: var(--surface-4); }
+.d-dot { fill: var(--surface-5); }
+.d-tab { fill: var(--surface-3); }
+.d-bar { fill: var(--surface-1); stroke: var(--surface-4); }
+.d-focus { fill: none; stroke: var(--brand); stroke-width: 1.5; opacity: 0.85; }
+.d-panel, .d-dialog { fill: var(--surface-3); stroke: var(--surface-4); }
+.d-dialog-head { fill: var(--surface-4); }
+.d-input { fill: var(--surface-1); stroke: var(--surface-4); }
+.d-input-focus { fill: var(--surface-1); stroke: var(--brand); stroke-width: 1.5; }
+.d-button { fill: var(--surface-4); }
+.d-button-primary { fill: var(--brand); }
+.d-button-text { fill: #06100b; font: 600 12px var(--font); }
+/* Button captions are the strings the browser translates, so they are set a
+   size smaller to survive Russian and Ukrainian without spilling out. */
+.d-btn-label { fill: var(--text-dim); font: 500 11px var(--font); }
+.d-btn-label.on-brand { fill: #06100b; font-weight: 600; }
+.d-switch-on { fill: var(--brand); }
+.d-knob { fill: #06100b; }
+.d-folder { fill: var(--brand); opacity: 0.9; }
+.d-folder-dim { fill: var(--surface-5); }
+.d-selected { fill: var(--brand); opacity: 0.14; }
+.d-pill-ok { fill: rgba(9, 222, 120, 0.16); }
+.d-ok { fill: var(--brand); font: 600 12px var(--font); }
+.d-title { fill: var(--text-bright); font: 600 15px var(--font); }
+.d-label { fill: var(--text); font: 500 12px var(--font); }
+.d-muted { fill: var(--text-dim); font: 400 12px var(--font); }
+.d-mono { fill: var(--text-bright); font: 400 12px var(--mono); }
+.d-arrow { stroke: var(--brand); stroke-width: 1.6; fill: none; }
+.d-arrowhead { fill: var(--brand); }
+
+.done, .trouble { padding: 2.5rem 0; border-top: 1px solid var(--surface-4); }
+.done h2, .trouble h2 { font-size: 1.5rem; margin-bottom: 0.9rem; }
+.done p { color: var(--text-dim); }
+.trouble dl { margin: 0; }
+.trouble dt { color: var(--text-bright); font-weight: 600; margin-top: 1.1rem; font-size: 0.95rem; }
+.trouble dd { margin: 0.3rem 0 0; color: var(--text-dim); font-size: 0.95rem; }
+.trouble .note { margin-top: 1.75rem; }
+.trouble .note a { color: var(--brand); text-decoration: none; }
+.trouble .note a:hover { text-decoration: underline; }
+
+.hidden { display: none !important; }
+
 @media (max-width: 860px) {
   .split, .split.reverse { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
   .split.reverse .split-copy { order: 0; }
   .top-nav { display: none; }
+  .top { gap: 1rem; padding: 0.9rem 1rem; }
   .hero { padding-top: 4rem; }
   .strip { gap: 2rem 2.5rem; }
+  .guide { padding-top: 2rem; }
+  .step { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+  .copyrow { flex-direction: column; }
 }
 
 @media (prefers-reduced-motion: reduce) {
