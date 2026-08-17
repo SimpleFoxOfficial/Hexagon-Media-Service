@@ -6,6 +6,7 @@ Built because online converter sites are slow, ad-ridden and untrustworthy.
 
 **[simplefoxofficial.github.io/Hexagon-Media-Service](https://simplefoxofficial.github.io/Hexagon-Media-Service/)**
 - downloads, screenshots and the short version.
+-# Please read the manual before reporting issues.
 
 ![The Download page](docs/shots/download-dark.png)
 
