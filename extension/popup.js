@@ -75,7 +75,7 @@ function parseRange(text) {
 async function init() {
   const ping = await send('ping')
   if (!ping?.ok) {
-    say(ping?.error || 'Media Downloader is not reachable. Is it running?', 'err')
+    say(ping?.error || 'Hexagon Media Service is not reachable. Is it running?', 'err')
     return
   }
   settings = (await send('settings'))?.result || {}

@@ -115,12 +115,54 @@ async function tabMessage(tabId, message) {
   return reply.data
 }
 
+/** Wait until fewer than `limit` downloads are in flight. */
+async function waitForSlot(limit) {
+  while (active.size >= limit) {
+    await new Promise((r) => setTimeout(r, 700))
+  }
+}
+
+/** Wait until the staging drive has room, reporting why we are stalled. */
+async function waitForSpace(minFree) {
+  for (let attempt = 0; ; attempt++) {
+    let space
+    try {
+      space = await api('/space')
+    } catch {
+      return // app unreachable; let the download attempt fail normally
+    }
+    if (space.ok || !minFree) return
+
+    if (attempt % 10 === 0) {
+      await api('/progress', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'waiting-space',
+          filename: '',
+          free: space.free,
+          freeText: space.freeText
+        })
+      }).catch(() => {})
+    }
+    // Files are still being moved off the drive; give that a chance to help.
+    await new Promise((r) => setTimeout(r, 3000))
+  }
+}
+
 async function runBatch({ items, settings }) {
   const tabId = await findTab()
   const quality = settings.quality || 'best'
+  const limit = Math.max(1, Number(settings.maxConcurrent) || 3)
+  const minFree = Number(settings.minFreeBytes) || 0
   const result = { started: 0, handedToApp: 0, failed: [] }
 
   for (const item of items) {
+    // The browser runs these itself, so the limit has to be enforced here.
+    // Previously every item was started immediately and a season could fill
+    // the disk before anything was moved off it.
+    await waitForSlot(limit)
+    await waitForSpace(minFree)
+
     const tag = item.season ? `S${item.season}E${item.episode}` : 'film'
     let resolved
     try {

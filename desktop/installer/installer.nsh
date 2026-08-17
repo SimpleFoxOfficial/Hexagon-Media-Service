@@ -6,12 +6,12 @@
 
 !macro customHeader
   ; Shown in the installer's window title and Add/Remove Programs.
-  BrandingText "Media Downloader ${VERSION}"
+  BrandingText "Hexagon Media Service ${VERSION}"
 !macroend
 
 !macro customWelcomePage
-  !define MUI_WELCOMEPAGE_TITLE "Install Media Downloader"
-  !define MUI_WELCOMEPAGE_TEXT   "This will install Media Downloader ${VERSION} on your computer.$\r$\n$\r$\nIt downloads from YouTube, HDRezka, Reddit, Twitter and around 1800 other sites. Everything runs locally: no account, no telemetry, nothing uploaded.$\r$\n$\r$\nThe download engine is bundled, so Python is not required. ffmpeg is needed separately for merging and audio conversion.$\r$\n$\r$\nClose Media Downloader if it is running, then click Next."
+  !define MUI_WELCOMEPAGE_TITLE "Install Hexagon Media Service"
+  !define MUI_WELCOMEPAGE_TEXT   "This will install Hexagon Media Service ${VERSION} on your computer.$\r$\n$\r$\nIt downloads from YouTube, HDRezka, Reddit, Twitter and around 1800 other sites. Everything runs locally: no account, no telemetry, nothing uploaded.$\r$\n$\r$\nThe download engine is bundled, so Python is not required. ffmpeg is needed separately for merging and audio conversion.$\r$\n$\r$\nClose Hexagon Media Service if it is running, then click Next."
   !insertmacro MUI_PAGE_WELCOME
 !macroend
 
@@ -19,18 +19,45 @@
   ; A running copy would keep its own files locked and produce a confusing
   ; failure part-way through.
   DetailPrint "Checking for a running copy..."
-  nsExec::Exec 'taskkill /IM "Media Downloader.exe" /F'
+  nsExec::Exec 'taskkill /IM "Hexagon Media Service.exe" /F'
   Pop $0
   nsExec::Exec 'taskkill /IM "mediadl-engine.exe" /F'
   Pop $0
 
+  ; Detect a Chromium browser for the extension. Inlined rather than kept in a
+  ; Function, because electron-builder compiles this script for the uninstaller
+  ; too, where a free-standing installer Function is unreferenced and NSIS
+  ; treats that warning as an error.
+  StrCpy $1 ""
+  ReadRegStr $0 HKLM "SOFTWARE\Clients\StartMenuInternet\Google Chrome\shell\open\command" ""
+  StrCmp $0 "" +3
+    StrCpy $1 "Google Chrome"
+    Goto browserfound
+
+  ReadRegStr $0 HKLM "SOFTWARE\Clients\StartMenuInternet\Microsoft Edge\shell\open\command" ""
+  StrCmp $0 "" +3
+    StrCpy $1 "Microsoft Edge"
+    Goto browserfound
+
+  ReadRegStr $0 HKLM "SOFTWARE\Clients\StartMenuInternet\Brave\shell\open\command" ""
+  StrCmp $0 "" +2
+    StrCpy $1 "Brave"
+
+  browserfound:
+  StrCmp $1 "" 0 +3
+    DetailPrint "No Chromium browser detected; the extension can be added later."
+    Goto browserdone
+  DetailPrint "Detected browser: $1"
+  browserdone:
+
+  DetailPrint "Extension files: $INSTDIR\resources\extension"
   DetailPrint "Installed to: $INSTDIR"
-  DetailPrint "Settings will be stored in: $APPDATA\MediaDownloader"
+  DetailPrint "Settings will be stored in: $APPDATA\HexagonMediaService"
 !macroend
 
 !macro customUnInstall
-  DetailPrint "Stopping Media Downloader..."
-  nsExec::Exec 'taskkill /IM "Media Downloader.exe" /F'
+  DetailPrint "Stopping Hexagon Media Service..."
+  nsExec::Exec 'taskkill /IM "Hexagon Media Service.exe" /F'
   Pop $0
   nsExec::Exec 'taskkill /IM "mediadl-engine.exe" /F'
   Pop $0
@@ -38,15 +65,22 @@
 !macroend
 
 !macro customFinishPage
-  !define MUI_FINISHPAGE_TITLE "Media Downloader is installed"
-  !define MUI_FINISHPAGE_TEXT  "Media Downloader ${VERSION} has been installed.$\r$\n$\r$\nTo download from HDRezka you also need the browser extension. The manual explains how to install and pair it, and covers everything else."
+  !define MUI_FINISHPAGE_TITLE "Hexagon Media Service is installed"
+  !define MUI_FINISHPAGE_TEXT  "Hexagon Media Service ${VERSION} has been installed.$\r$\n$\r$\nDownloading from HDRezka needs the browser extension. Tick the box below to open the extension folder and your browser's extensions page; drag the folder onto that page to add it, then pair it from Download > HDRezka.$\r$\n$\r$\nEverything else works without it."
 
-  !define MUI_FINISHPAGE_RUN "$INSTDIR\Media Downloader.exe"
-  !define MUI_FINISHPAGE_RUN_TEXT "Start Media Downloader"
+  !define MUI_FINISHPAGE_RUN "$INSTDIR\Hexagon Media Service.exe"
+  !define MUI_FINISHPAGE_RUN_TEXT "Start Hexagon Media Service"
 
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\resources\Media-Downloader-Manual.pdf"
-  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the manual"
+  ; Chromium will not let an installer silently side-load an unpacked
+  ; extension, and forcing one in through enterprise policy would be a
+  ; security decision that is not ours to make. Opening the folder is the
+  ; honest halfway point: one drag onto the extensions page finishes it.
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\resources\extension"
+  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the browser extension folder"
   !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+
+  !define MUI_FINISHPAGE_LINK "Open the manual"
+  !define MUI_FINISHPAGE_LINK_LOCATION "$INSTDIR\resources\Hexagon-Media-Service-Manual.pdf"
 
   !insertmacro MUI_PAGE_FINISH
 !macroend

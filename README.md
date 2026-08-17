@@ -1,4 +1,4 @@
-# Media Downloader
+# Hexagon Media Service
 
 A private desktop downloader for YouTube, HDRezka, Reddit, Twitter/X and roughly
 1800 other sites. Everything runs locally: no account, no telemetry, no upload.

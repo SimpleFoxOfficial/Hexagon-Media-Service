@@ -33,6 +33,12 @@ log = logs.get("daemon")
 
 PROTOCOL_VERSION = 1
 
+# How many items to allow through when their size could not be measured.
+SAFE_BATCH_WHEN_UNKNOWN = 3
+
+# Refuse to start another download when the staging drive is below this.
+MIN_FREE_BYTES = 3 * 1024 * 1024 * 1024
+
 
 def job_payload(job: Job) -> dict:
     """The wire shape of a job. Kept flat so the renderer can use it directly."""
@@ -121,6 +127,7 @@ class Daemon:
                 "/complete": self._bridge_complete,
                 "/commands": self._bridge_commands,
                 "/result": self._bridge_result,
+                "/space": self._bridge_space,
             },
         )
         self.bridge.start()
@@ -306,7 +313,7 @@ class Daemon:
     # -------------------------------------------------- extension downloads
 
     def _bridge_settings(self, _payload: dict) -> dict:
-        """What the extension needs to name and fetch files our way."""
+        """What the extension needs to name, pace and fetch files our way."""
         rezka, behaviour = self.settings.rezka, self.settings.behaviour
         return {
             "quality": rezka.quality,
@@ -314,9 +321,26 @@ class Daemon:
             "tagQuality": False,
             "overwrite": False,
             "seasonFolders": behaviour.tv_folders,
+            # The browser runs its own transfers, so the concurrency limit has
+            # to be handed to it. Without this it started every item at once
+            # regardless of what the setting said.
+            "maxConcurrent": max(1, int(behaviour.max_concurrent)),
+            "minFreeBytes": MIN_FREE_BYTES,
             "destination": str(
                 presets.target_dir(behaviour, self.settings.preset, "HDRezka")
             ),
+        }
+
+    def _bridge_space(self, _payload: dict) -> dict:
+        """Free space on the staging drive, checked before each download."""
+        from .core import filing
+
+        free = filing.free_space(paths.default_download_dir())
+        return {
+            "free": free,
+            "freeText": filing.human_size(free),
+            "minFree": MIN_FREE_BYTES,
+            "ok": free > MIN_FREE_BYTES,
         }
 
     def _items_from(self, params: dict) -> list[dict]:
@@ -372,9 +396,19 @@ class Daemon:
 
         # Keep a margin so the drive is never filled to the last byte.
         usable = max(0, int(staging * 0.9))
-        batch = len(items)
-        if per_item and total > usable:
+
+        if not per_item:
+            # Measuring failed, so nothing is known about the total. Assuming it
+            # fits is what let a whole season start at once and fill the drive;
+            # an unknown size is a reason to be careful, not confident.
+            batch = min(len(items), SAFE_BATCH_WHEN_UNKNOWN)
+            log.warning(
+                "Could not size the selection; limiting to %d per batch", batch
+            )
+        elif total > usable:
             batch = max(1, usable // per_item)
+        else:
+            batch = len(items)
 
         return {
             "count": len(items),

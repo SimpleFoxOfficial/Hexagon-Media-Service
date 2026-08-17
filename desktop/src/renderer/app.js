@@ -114,7 +114,7 @@ function renderShell() {
       <header class="navbar">
         <div class="brand">
           <div class="brand-mark">${brandMark(26)}</div>
-          <div class="brand-name">Media Downloader</div>
+          <div class="brand-name">Hexagon Media Service</div>
         </div>
         <nav class="nav-links" id="nav"></nav>
         <div class="grow drag-region"></div>

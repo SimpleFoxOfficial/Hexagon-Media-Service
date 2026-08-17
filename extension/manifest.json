@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Media Downloader Bridge",
+  "name": "Hexagon Media Service Bridge",
   "version": "1.0.0",
-  "description": "Sends the video stream a HDRezka page has already resolved to the local Media Downloader app.",
+  "description": "Sends the video stream a HDRezka page has already resolved to the local Hexagon Media Service app.",
   "permissions": ["storage", "activeTab", "scripting", "downloads", "tabs", "alarms"],
   "web_accessible_resources": [
     {
@@ -20,7 +20,7 @@
     "https://*.rezka.co/*"
   ],
   "background": { "service_worker": "background.js" },
-  "action": { "default_title": "Send to Media Downloader", "default_popup": "popup.html" },
+  "action": { "default_title": "Send to Hexagon Media Service", "default_popup": "popup.html" },
   "options_page": "options.html",
   "content_scripts": [
     {

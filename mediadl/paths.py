@@ -10,7 +10,7 @@ import sys
 import uuid
 from pathlib import Path
 
-from . import APP_ID
+from . import APP_ID, LEGACY_APP_ID
 
 
 def is_frozen() -> bool:
@@ -33,6 +33,21 @@ def config_dir() -> Path:
     base = os.environ.get("APPDATA")
     root = Path(base) if base else Path.home() / ".config"
     path = root / APP_ID
+
+    # Carry settings, history and the pairing token across the rename rather
+    # than silently starting fresh and losing the user's setup.
+    if not path.exists():
+        legacy = root / LEGACY_APP_ID
+        if legacy.is_dir():
+            try:
+                legacy.rename(path)
+            except OSError:
+                # A locked file leaves the old folder in place; copy instead.
+                try:
+                    shutil.copytree(legacy, path, dirs_exist_ok=True)
+                except OSError:
+                    pass
+
     path.mkdir(parents=True, exist_ok=True)
     return path
 

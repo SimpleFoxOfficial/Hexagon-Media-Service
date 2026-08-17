@@ -42,7 +42,7 @@ function createWindow() {
     // The window draws its own titlebar so it matches the interface rather
     // than sitting under a grey Windows strip.
     frame: false,
-    title: 'Media Downloader',
+    title: 'Hexagon Media Service',
     icon: path.join(PROJECT_ROOT, 'mediadl', 'resources', 'app.ico'),
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),

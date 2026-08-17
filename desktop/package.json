@@ -1,8 +1,8 @@
 {
-  "name": "media-downloader-desktop",
+  "name": "hexagon-media-service",
   "version": "1.0.0",
   "private": true,
-  "description": "Electron shell for Media Downloader. The interface is web; the engine is Python.",
+  "description": "Electron shell for Hexagon Media Service. The interface is web; the engine is Python.",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
@@ -14,8 +14,8 @@
     "electron-builder": "^25.0.0"
   },
   "build": {
-    "appId": "com.simplefox.mediadownloader",
-    "productName": "Media Downloader",
+    "appId": "com.simplefox.hexagonmediaservice",
+    "productName": "Hexagon Media Service",
     "directories": {
       "output": "../build-output"
     },
@@ -29,12 +29,16 @@
         "to": "engine"
       },
       {
-        "from": "../docs/Media-Downloader-Manual.pdf",
-        "to": "Media-Downloader-Manual.pdf"
+        "from": "../docs/Hexagon-Media-Service-Manual.pdf",
+        "to": "Hexagon-Media-Service-Manual.pdf"
       },
       {
         "from": "../vendor/ffmpeg",
         "to": "ffmpeg"
+      },
+      {
+        "from": "../extension",
+        "to": "extension"
       }
     ],
     "win": {
@@ -51,7 +55,7 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Media Downloader",
+      "shortcutName": "Hexagon Media Service",
       "menuCategory": false,
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
@@ -60,11 +64,11 @@
       "installerHeaderIcon": "../mediadl/resources/app.ico",
       "license": "installer/LICENSE.txt",
       "include": "installer/installer.nsh",
-      "artifactName": "Media Downloader ${version} Setup.${ext}",
-      "uninstallDisplayName": "Media Downloader ${version}"
+      "artifactName": "Hexagon Media Service ${version} Setup.${ext}",
+      "uninstallDisplayName": "Hexagon Media Service ${version}"
     },
     "extraMetadata": {
-      "description": "Private downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites"
+      "description": "Hexagon Media Service - private downloader for YouTube, HDRezka, Reddit, Twitter and about 1800 other sites"
     }
   },
   "allowScripts": {

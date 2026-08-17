@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
+import threading
 import time
 from pathlib import Path
 
@@ -33,6 +35,90 @@ CHUNK = 4 * 1024 * 1024
 STABLE_CHECKS = 3
 STABLE_INTERVAL = 0.4
 DEFAULT_TIMEOUT = 180.0
+
+# Only one move at a time. Several downloads finish together, and three
+# simultaneous multi-gigabyte copies saturate the disk queue and make the whole
+# machine feel stalled. Serialising them costs nothing overall: the disk is the
+# bottleneck either way, and the files still arrive just as fast.
+_move_lock = threading.Lock()
+
+# ------------------------------------------------------------ Win32 file move
+
+_MOVEFILE_REPLACE_EXISTING = 0x1
+_MOVEFILE_COPY_ALLOWED = 0x2
+_PROGRESS_CONTINUE = 0
+
+_win32_move = None
+if sys.platform == "win32":
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        _PROGRESS_ROUTINE = ctypes.WINFUNCTYPE(
+            wintypes.DWORD,          # result
+            wintypes.LARGE_INTEGER,  # TotalFileSize
+            wintypes.LARGE_INTEGER,  # TotalBytesTransferred
+            wintypes.LARGE_INTEGER,  # StreamSize
+            wintypes.LARGE_INTEGER,  # StreamBytesTransferred
+            wintypes.DWORD,          # dwStreamNumber
+            wintypes.DWORD,          # dwCallbackReason
+            wintypes.HANDLE,         # hSourceFile
+            wintypes.HANDLE,         # hDestinationFile
+            wintypes.LPVOID,         # lpData
+        )
+
+        _win32_move = ctypes.windll.kernel32.MoveFileWithProgressW
+        _win32_move.argtypes = [
+            wintypes.LPCWSTR,
+            wintypes.LPCWSTR,
+            _PROGRESS_ROUTINE,
+            wintypes.LPVOID,
+            wintypes.DWORD,
+        ]
+        _win32_move.restype = wintypes.BOOL
+    except Exception:  # pragma: no cover - non-Windows or restricted runtime
+        _win32_move = None
+
+
+def _move_via_win32(source: Path, target: Path, on_progress) -> bool:
+    """Move using the same API Explorer uses. Returns False to fall back.
+
+    This hands the copy to the kernel instead of shuttling every byte through
+    Python. It picks a rename when the volumes match, streams sensibly when
+    they do not, and does not force a full cache flush at the end, which is
+    what made the naive loop stall the machine.
+    """
+    if _win32_move is None:
+        return False
+
+    last = [0.0]
+
+    def callback(total, transferred, _ss, _sbt, _num, _reason, _hs, _hd, _data):
+        if on_progress and total:
+            percent = transferred / total * 100.0
+            if percent - last[0] >= 1.0 or percent >= 100.0:
+                last[0] = percent
+                try:
+                    on_progress(int(transferred), int(total))
+                except Exception:
+                    pass
+        return _PROGRESS_CONTINUE
+
+    ok = _win32_move(
+        str(source),
+        str(target),
+        _PROGRESS_ROUTINE(callback),
+        None,
+        _MOVEFILE_COPY_ALLOWED | _MOVEFILE_REPLACE_EXISTING,
+    )
+    if not ok:
+        import ctypes
+
+        log.warning(
+            "MoveFileWithProgressW failed (%d); falling back to a manual copy",
+            ctypes.GetLastError(),
+        )
+    return bool(ok)
 
 
 def wait_until_stable(
@@ -115,38 +201,50 @@ def move_file(
         except Exception:
             log.debug("progress callback failed", exc_info=True)
 
-    # Same volume: a rename is atomic and instant, so skip the copy entirely.
-    if _same_volume(source, target):
-        try:
-            os.replace(source, target)
+    # One move at a time; see _move_lock.
+    with _move_lock:
+        # Same volume: a rename is atomic and instant, so skip the copy entirely.
+        if _same_volume(source, target):
+            try:
+                os.replace(source, target)
+                report(total)
+                log.info("Renamed %s -> %s", source.name, target)
+                return target
+            except OSError as exc:
+                log.warning("Rename failed, falling back to a copy: %s", exc)
+
+        # Let the kernel do the copy. Only if that is unavailable or fails do
+        # we shuttle the bytes through Python.
+        if _move_via_win32(source, target, on_progress):
             report(total)
-            log.info("Renamed %s -> %s", source.name, target)
+            log.info("Moved %s -> %s (%d bytes)", source.name, target, total)
             return target
-        except OSError as exc:
-            log.warning("Rename failed, falling back to a copy: %s", exc)
 
-    staging = target.with_name(target.name + ".part")
-    copied = 0
-    try:
-        with open(source, "rb") as src, open(staging, "wb") as dst:
-            while True:
-                block = src.read(CHUNK)
-                if not block:
-                    break
-                dst.write(block)
-                copied += len(block)
-                report(copied)
-            dst.flush()
-            os.fsync(dst.fileno())
+        staging = target.with_name(target.name + ".part")
+        copied = 0
+        try:
+            with open(source, "rb") as src, open(staging, "wb") as dst:
+                while True:
+                    block = src.read(CHUNK)
+                    if not block:
+                        break
+                    dst.write(block)
+                    copied += len(block)
+                    report(copied)
+                # Deliberately no fsync: forcing a multi-gigabyte flush stalls
+                # every other process on the machine. Closing the file hands
+                # the data to the OS, which writes it back on its own schedule,
+                # exactly as a normal file copy does.
+                dst.flush()
 
-        if total and copied != total:
-            raise OSError(f"copied {copied} of {total} bytes")
+            if total and copied != total:
+                raise OSError(f"copied {copied} of {total} bytes")
 
-        os.replace(staging, target)
-    except BaseException:
-        # Never leave a half-written file that looks like a finished download.
-        staging.unlink(missing_ok=True)
-        raise
+            os.replace(staging, target)
+        except BaseException:
+            # Never leave a half-written file that looks like a finished download.
+            staging.unlink(missing_ok=True)
+            raise
 
     try:
         source.unlink()

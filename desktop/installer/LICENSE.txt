@@ -1,4 +1,4 @@
-Media Downloader
+Hexagon Media Service
 ================
 
 A private, local media downloader. Nothing is uploaded, no account is required,
@@ -8,7 +8,7 @@ and every setting stays on this machine.
 What gets installed
 -------------------
 
-  * Media Downloader        the application and its interface
+  * Hexagon Media Service        the application and its interface
   * mediadl-engine.exe      the bundled download engine, used automatically
 
 Settings, logs and download history are written to:

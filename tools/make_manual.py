@@ -1,4 +1,4 @@
-"""Generate docs/Media-Downloader-Manual.pdf.
+"""Generate docs/Hexagon-Media-Service-Manual.pdf.
 
     python tools/make_manual.py
 
@@ -164,7 +164,7 @@ def decorate(canvas, doc):
 
     canvas.setFont("Helvetica", 8)
     canvas.setFillColor(MUTED)
-    canvas.drawString(MARGIN, MARGIN - 11 * mm, "Media Downloader manual")
+    canvas.drawString(MARGIN, MARGIN - 11 * mm, "Hexagon Media Service manual")
     canvas.drawRightString(width - MARGIN, MARGIN - 11 * mm, f"Page {doc.page}")
 
     if doc.page == 1:
@@ -177,7 +177,7 @@ def build_story():
     story = []
 
     story.append(Spacer(1, 14 * mm))
-    story.append(Paragraph("Media Downloader", S["title"]))
+    story.append(Paragraph("Hexagon Media Service", S["title"]))
     story.append(Paragraph(
         "Building, installing and using the app, its engine and the browser "
         f"extension.<br/>Revised {date.today().isoformat()}.", S["subtitle"]))
@@ -281,7 +281,7 @@ def build_story():
         ["python -m PyInstaller Engine.spec", "dist-engine\\mediadl-engine.exe"],
         ["npm run dist", "dist-desktop\\ installer and portable"],
         ["python tools\\make_icon.py", "mediadl\\resources\\app.ico"],
-        ["python tools\\make_manual.py", "docs\\Media-Downloader-Manual.pdf"],
+        ["python tools\\make_manual.py", "docs\\Hexagon-Media-Service-Manual.pdf"],
     ], [78 * mm, 62 * mm], code_col=0))
 
     story.append(warn(
@@ -495,16 +495,16 @@ def build_story():
 
 
 def main() -> int:
-    out = ROOT / "docs" / "Media-Downloader-Manual.pdf"
+    out = ROOT / "docs" / "Hexagon-Media-Service-Manual.pdf"
     out.parent.mkdir(exist_ok=True)
 
     doc = BaseDocTemplate(
         str(out), pagesize=A4,
         leftMargin=MARGIN, rightMargin=MARGIN,
         topMargin=MARGIN, bottomMargin=MARGIN + 4 * mm,
-        title="Media Downloader manual",
-        author="Media Downloader",
-        subject="Building, installing and using Media Downloader",
+        title="Hexagon Media Service manual",
+        author="Hexagon Media Service",
+        subject="Building, installing and using Hexagon Media Service",
     )
     frame = Frame(
         doc.leftMargin, doc.bottomMargin,

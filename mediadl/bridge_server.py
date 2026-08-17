@@ -156,7 +156,7 @@ def _make_handler(bridge: BridgeServer):
             bridge.connected = True
 
             if self.path == "/ping":
-                self._send(200, {"ok": True, "app": "Media Downloader"})
+                self._send(200, {"ok": True, "app": "Hexagon Media Service"})
                 return
 
             handler = bridge.handlers.get(self.path)
