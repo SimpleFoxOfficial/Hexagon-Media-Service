@@ -997,6 +997,8 @@ function renderRezka(column, rail) {
     window.host.openPath(bridge.extensionDir || '')
   )
 
+  column.appendChild(rezkaQueueCard())
+
   const captured = el(`
     <div class="card">
       <div class="card-head"><h2>Captured from the browser</h2></div>
@@ -1005,6 +1007,115 @@ function renderRezka(column, rail) {
   column.appendChild(captured)
   renderCapture(captured.querySelector('#capture-body'))
   renderRail(rail)
+}
+
+/**
+ * The browser queue: what is staged, what it is doing, and the two controls.
+ *
+ * The extension owns the queue and reports into `state.rezkaQueue`; this only
+ * paints it. Everything stays staged until Start, so a whole season can be
+ * chosen without anything beginning to download.
+ */
+const QUEUE_STATUS = {
+  idle: ['Nothing queued', ''],
+  staged: ['Ready to start', 'brand'],
+  running: ['Downloading', 'blue'],
+  'waiting-page': ['Waiting for the HDRezka page', 'orange'],
+  done: ['Finished', 'green'],
+  cancelled: ['Cancelled', 'red']
+}
+
+function rezkaQueueCard() {
+  const card = el(`
+    <div class="card">
+      <div class="card-head"><h2>Browser queue</h2><span class="badge" id="rq-badge"></span></div>
+      <div class="col" id="rq-body"></div>
+    </div>`)
+
+  const paint = () => {
+    const q = state.rezkaQueue || { status: 'idle', total: 0 }
+    const [label, tone] = QUEUE_STATUS[q.status] || QUEUE_STATUS.idle
+    const body = card.querySelector('#rq-body')
+    const badge = card.querySelector('#rq-badge')
+    badge.textContent = label
+    badge.className = `badge ${tone}`
+    body.innerHTML = ''
+
+    if (!q.total) {
+      body.appendChild(
+        el(`<div class="muted">Pick episodes above and add them here. Nothing starts
+            downloading until you press Start.</div>`)
+      )
+      return
+    }
+
+    body.appendChild(
+      el(`<div class="muted">${q.done || 0} of ${q.total} done${
+        q.failed ? `, ${q.failed} failed` : ''
+      }${q.active ? `, ${q.active} downloading` : ''}${
+        q.pending ? `, ${q.pending} waiting` : ''
+      }</div>`)
+    )
+
+    const bar = el(`<div class="bar"><span></span></div>`)
+    bar.firstElementChild.style.width = `${Math.round(((q.done || 0) / q.total) * 100)}%`
+    body.appendChild(bar)
+
+    // The one status worth explaining: the queue is intact and simply cannot
+    // see a tab, so saying which page to reopen is the whole fix.
+    if (q.status === 'waiting-page') {
+      const notice = el(`
+        <div class="banner">${icon('browser', 16)}<div>
+          <b>The HDRezka page is not open any more.</b><br>
+          ${q.message || 'Open the title again and the queue carries on by itself.'}
+        </div></div>`)
+      body.appendChild(notice)
+    }
+
+    if (q.errors && q.errors.length) {
+      const list = el(`<div class="muted mono"></div>`)
+      list.textContent = q.errors.join('\n')
+      body.appendChild(list)
+    }
+
+    const row = el(`<div class="row" style="flex-wrap:wrap"></div>`)
+    const running = q.status === 'running' || q.status === 'waiting-page'
+
+    if (!running) {
+      const start = el(
+        `<button class="btn brand">${icon('play')} ${
+          q.status === 'staged' ? `Start ${q.pending || q.total} download(s)` : 'Start again'
+        }</button>`
+      )
+      start.addEventListener('click', async () => {
+        start.disabled = true
+        await call('bridge.start').catch(() => {})
+      })
+      row.appendChild(start)
+    }
+
+    if (running || q.pending) {
+      const cancel = el(`<button class="btn danger">${icon('close')} Cancel all</button>`)
+      cancel.addEventListener('click', async () => {
+        cancel.disabled = true
+        await call('bridge.cancel').catch(() => {})
+        toast('Queue cancelled', 'info')
+      })
+      row.appendChild(cancel)
+    }
+
+    if (!running && q.total) {
+      const clear = el(`<button class="btn ghost">${icon('trash')} Clear</button>`)
+      clear.addEventListener('click', () => call('bridge.clear').catch(() => {}))
+      row.appendChild(clear)
+    }
+
+    body.appendChild(row)
+  }
+
+  paint()
+  state.paintRezkaQueue = paint
+  return card
 }
 
 /** Translation, season, episodes and quality, all decided here in the app. */
@@ -1249,15 +1360,15 @@ function rezkaPicker(page) {
       }
 
       go.textContent = 'Sending to browser...'
+      // Staged, not started: the user presses Start in the Browser queue card.
       const res = await window.engine.call('bridge.download', {
         items,
         quality: qSel.value,
         show,
-        batchSize: estimate.batchSize || 0
+        start: false
       })
-      navigate('queue')
       toast(
-        `${res.accepted} item(s) queued in ${res.batches} batch(es)`,
+        `${res.accepted} item(s) staged. Press Start when you are ready.`,
         'success',
         6000
       )
@@ -1337,6 +1448,27 @@ window.engine.onEvent(async (name, data) => {
   // after the browser hands the file over.
   if (name === 'rezka.filing') {
     upsertBrowser(data)
+    return
+  }
+
+  if (name === 'rezka.queue') {
+    const previous = state.rezkaQueue?.status
+    state.rezkaQueue = data
+
+    if (data.status === 'waiting-page' && previous !== 'waiting-page') {
+      toast(
+        'The HDRezka page is not open any more. Open the title again and the queue continues.',
+        'error',
+        12000
+      )
+    } else if (data.status === 'running' && previous === 'waiting-page') {
+      toast('Found the page again, carrying on', 'success')
+    } else if (data.status === 'done' && previous && previous !== 'done') {
+      toast(`Browser queue finished: ${data.done} done, ${data.failed} failed`, 'success', 8000)
+    }
+
+    if (state.paintRezkaQueue) state.paintRezkaQueue()
+    updateStats()
     return
   }
 

@@ -108,6 +108,10 @@ class Daemon:
                 {"type": "episodes", "translatorId": str(p.get("translatorId", ""))}
             ),
             "bridge.download": self._bridge_download,
+            "bridge.start": lambda _p: self._bridge_queue_control("start"),
+            "bridge.cancel": lambda _p: self._bridge_queue_control("cancel"),
+            "bridge.clear": lambda _p: self._bridge_queue_control("clear"),
+            "bridge.queueStatus": lambda _p: self._bridge_queue_control("status", timeout=10.0),
             "bridge.estimate": self._bridge_estimate,
             "bridge.downloads": lambda _p: {
                 "items": list(self._browser_downloads.values())
@@ -128,6 +132,7 @@ class Daemon:
                 "/commands": self._bridge_commands,
                 "/result": self._bridge_result,
                 "/space": self._bridge_space,
+                "/queue-state": self._bridge_queue_state,
             },
         )
         self.bridge.start()
@@ -423,12 +428,17 @@ class Daemon:
         }
 
     def _bridge_download(self, params: dict) -> dict:
-        """Season and episode choices made in the app, executed in the browser.
+        """Hand the whole selection to the extension as a queue.
 
-        Runs on a worker thread and in batches: the browser stages files in the
-        Downloads folder, so a whole season could fill that drive before
-        anything is moved off it. Each batch waits for its files to be filed
-        before the next starts.
+        The extension paces it: it starts up to `max_concurrent` at a time and
+        waits for room on the staging drive before each one. Nothing is chunked
+        here any more, and nothing here blocks waiting for the browser.
+
+        The app used to send one batch at a time and wait, inside a single
+        long-lived call, for every file in it to be filed. That call lived in an
+        MV3 service worker, which Chrome kills after a few idle seconds - so the
+        loop died mid-season, the reply never came, and the app sat waiting for
+        a batch that no longer existed while the log still said it was going.
         """
         items = self._items_from(params)
         if not items:
@@ -440,84 +450,41 @@ class Daemon:
         if params.get("show"):
             settings["show"] = str(params["show"])
 
-        batch_size = int(params.get("batchSize") or 0) or len(items)
-        batch_size = max(1, min(batch_size, len(items)))
+        result = self._enqueue(
+            {
+                "type": "queue",
+                "items": items,
+                "settings": settings,
+                "show": settings.get("show", ""),
+                "start": bool(params.get("start", True)),
+            },
+            timeout=30.0,
+        )
+        return {"accepted": len(items), **(result or {})}
 
-        threading.Thread(
-            target=self._run_batches,
-            args=(items, settings, batch_size),
-            name="mediadl-batches",
-            daemon=True,
-        ).start()
+    def _bridge_queue_control(self, kind: str, timeout: float = 30.0) -> dict:
+        """start, cancel, clear or status, passed straight to the extension."""
+        return self._enqueue({"type": kind}, timeout=timeout) or {}
 
-        return {
-            "accepted": len(items),
-            "batchSize": batch_size,
-            "batches": (len(items) + batch_size - 1) // batch_size,
-        }
+    def _bridge_queue_state(self, payload: dict) -> dict:
+        """The extension telling us where its queue stands.
 
-    def _run_batches(self, items: list, settings: dict, batch_size: int) -> None:
-        chunks = [items[i : i + batch_size] for i in range(0, len(items), batch_size)]
-        log.info("Downloading %d item(s) in %d batch(es)", len(items), len(chunks))
-
-        for index, chunk in enumerate(chunks, start=1):
-            self._event(
-                "rezka.batch",
-                {"batch": index, "batches": len(chunks), "size": len(chunk), "stage": "starting"},
+        Pushed straight to the interface. `waiting-page` is the one worth
+        acting on: the queue is intact and simply cannot see a HDRezka tab, so
+        reopening the title is enough to carry on.
+        """
+        self._event("rezka.queue", payload)
+        status = str(payload.get("status") or "")
+        if status == "waiting-page":
+            log.warning("Queue paused: no HDRezka tab open (%s)", payload.get("show") or "")
+        elif status in ("done", "cancelled"):
+            log.info(
+                "Queue %s: %s done, %s failed",
+                status,
+                payload.get("done"),
+                payload.get("failed"),
             )
-            try:
-                result = self._enqueue(
-                    {"type": "download", "items": chunk, "settings": settings},
-                    timeout=300.0,
-                )
-            except Exception as exc:
-                log.error("Batch %d failed: %s", index, exc)
-                self._event(
-                    "rezka.batch",
-                    {"batch": index, "batches": len(chunks), "stage": "failed", "error": str(exc)},
-                )
-                return
-
-            self._event(
-                "rezka.batch",
-                {
-                    "batch": index,
-                    "batches": len(chunks),
-                    "stage": "downloading",
-                    "started": result.get("started", 0),
-                    "handedToApp": result.get("handedToApp", 0),
-                    "failed": result.get("failed", []),
-                },
-            )
-
-            if index < len(chunks):
-                self._wait_for_batch(result.get("started", 0), index, len(chunks))
-
-        self._event("rezka.batch", {"batches": len(chunks), "stage": "done"})
-
-    def _wait_for_batch(self, expected: int, index: int, total: int) -> None:
-        """Hold the next batch until this one has been moved off the staging drive."""
-        if expected <= 0:
-            return
-
-        deadline = time.time() + 3600
-        with self._command_lock:
-            baseline = len(self._filed)
-
-        while time.time() < deadline:
-            with self._command_lock:
-                done = len(self._filed) - baseline
-            if done >= expected:
-                log.info("Batch %d/%d filed; continuing", index, total)
-                return
-            self._event(
-                "rezka.batch",
-                {"batch": index, "batches": total, "stage": "waiting",
-                 "filed": done, "expected": expected},
-            )
-            time.sleep(2.0)
-
-        log.warning("Batch %d timed out waiting to be filed; continuing anyway", index)
+        return {"ok": True}
 
     def _bridge_commands(self, _payload: dict) -> dict:
         """Hand the extension whatever the app has queued for it."""
